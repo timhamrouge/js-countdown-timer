@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown-Timer</title>
+</head>
+<body>
+    <!-- <form target="_self"> -->
+    <label for="event-name">Event Name</label><br>
+    <input type="text" name="event-name" id="event-name" /><br>
+    <p id="event-name-error" style="color: red;"></p>
+
+    <label for="event-date" id="event-date-label">Event Date</label><br>
+    <input type="date" name="event-date" id="event-date" /><br>
+    <p id="event-date-error" style="color: red;"></p>
+
+
+    <!-- <label for="event-time-check" id="event-time-check">Time?</label> -->
+    <label for="event-time" id="event-time-label">Event Time</label><br>
+    <!-- <input type="checkbox" id="time-checkbox" name="time-checkbox" onclick="handleTimeFIeld()"><br> -->
+    <input type="time" name="event-time" id="event-time"/><br>
+    <input type="submit" value="Set Timer" onclick="validateInputs()"/>
+    <input type="button" value="clear stored timers" onclick="clearStorage()"/>
+    <!-- </form> -->
+    <p id="timer-name"></p>
+    <p id="timer-date"></p>
+    <p id="timer-time"></p>
+    <p id="countdown"></p>
+
+</body>
+    <script>
+        let threeYrInMils = 94670856000;
+
+        function addTimer(name, date) {
+            console.log(name, date, 'timothy')
+        // function aFunction() {
+        //     if(document.getElementById("event-name").value) {
+        //         var eventName = document.getElementById("event-name").value
+        //         document.getElementById("timer-name").innerHTML = eventName
+        //         localStorage.yourObject = JSON.stringify({eventName: eventName});
+        //     } else {
+        //         document.getElementById("event-name-error").innerHTML = 'You must provide an event name'
+        //     }
+        //     parseDate();
+        //     var eventDate = document.getElementById("event-date").value
+
+        //     console.log(eventDate);
+        //     console.log(getCurrentDateTime(), Date.parse(document.getElementById("event-date").value));
+        //     // if number is negative - handle
+        //     console.log(Date.parse(document.getElementById("event-date").value) - getCurrentDateTime());
+        //     if (!Date.parse(document.getElementById("event-date").value) - getCurrentDateTime()) {
+        //         console.log('date is in the past')
+        //     }
+
+
+        };
+
+        function validateInputs() {
+            var eventName = document.getElementById("event-name").value;
+            var eventTime = document.getElementById("event-time").value || "00:00";
+            var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+
+                if (!eventName) {
+                    document.getElementById("event-name-error").innerHTML = 'You must provide an event name';
+                } else {
+                    document.getElementById("event-name-error").innerHTML = '';
+                }
+
+                if (!eventDate) {
+                    document.getElementById("event-date-error").innerHTML = 'You must provide an event date';
+                } else {
+                    if ((eventDate - Date.now()) < 0) {
+                        document.getElementById("event-date-error").innerHTML = 'You cannot enter a date in the past';
+                    } else if (eventDate > (Date.now() + threeYrInMils)) {
+                        document.getElementById("event-date-error").innerHTML = 'You cannot enter a date more than 3 years in the future';
+                    } else {
+                    document.getElementById("event-date-error").innerHTML = '';
+                    }
+                }
+                // return;
+            addTimer(eventName, eventDate);
+        }
+        // console.log(JSON.parse(localStorage.yourObject) || {});
+        console.log(localStorage);
+        // var obj = JSON.parse(localStorage.yourObject || {});
+        // console.log(obj, 'here is obj');
+        function clearStorage() {
+            delete localStorage.yourObject;
+        }
+
+        function parseDate () {
+            // need to show error/warning message for when the date is overflow - more than 999 days?
+            // last 2 digits of the below is miliseconds, trim that, 3rd and 4th last is seconds, always 00
+            console.log(Date.parse(document.getElementById("event-date").value + 'T' + (document.getElementById("event-time").value || '00:00')));
+            var foo = Date.parse(document.getElementById("event-date").value);
+            console.log(foo);
+            // console.log(foo.getMinutes());
+        }
+
+
+
+
+
+        //     var eventTime = document.getElementById("event-time").value || '00:00'
+
+        //     document.getElementById("timer-date").innerHTML = eventDate
+        //     document.getElementById("timer-time").innerHTML = eventTime
+        //     document.getElementById("countdown").innerHTML = `${eventName}: `
+        // }
+    </script>
+</html>
