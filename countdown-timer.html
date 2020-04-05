@@ -21,7 +21,7 @@
     <input type="time" name="event-time" id="event-time"/><br>
     <input type="submit" value="Set Timer" onclick="validateInputs()"/>
     <input type="button" value="clear stored timers" onclick="clearStorage()"/>
-    
+
     <p id="timer-name"></p>
     <p id="timer-date"></p>
     <p id="timer-time"></p>
@@ -29,28 +29,43 @@
 
 </body>
     <script>
+
+        // function cb () {
+        //     console.log('a second has passed')
+        // }
+        // window.onload = function() {
+        //     setInterval(cb, 1000)
+        // }
+        // var interval;
+        // TODO
+        // use clearInterval and setInterval for the countdown
+        // use localStorage to set timers
+        // format milisecond for eventDate into actual date
+        //
+
         let threeYrInMils = 94670856000;
 
-        function addTimer(name, date) {
-            console.log(name, date, 'timothy')
-        // function aFunction() {
-        //     if(document.getElementById("event-name").value) {
-        //         var eventName = document.getElementById("event-name").value
-        //         document.getElementById("timer-name").innerHTML = eventName
-        //         localStorage.yourObject = JSON.stringify({eventName: eventName});
-        //     } else {
-        //         document.getElementById("event-name-error").innerHTML = 'You must provide an event name'
-        //     }
-        //     parseDate();
-        //     var eventDate = document.getElementById("event-date").value
+        function createTimer(name, date) {
+            let now = Date.now()
+            console.log(date, now, date - now);
 
-        //     console.log(eventDate);
-        //     console.log(getCurrentDateTime(), Date.parse(document.getElementById("event-date").value));
-        //     // if number is negative - handle
-        //     console.log(Date.parse(document.getElementById("event-date").value) - getCurrentDateTime());
-        //     if (!Date.parse(document.getElementById("event-date").value) - getCurrentDateTime()) {
-        //         console.log('date is in the past')
-        //     }
+            // subtract each from the next 
+
+            console.log(Math.floor((date - now) / 1000), 'seconds')
+            console.log(Math.floor((date - now) / 60000), 'minutes')
+            console.log(Math.floor((date - now) / 3600000), 'hours')
+            console.log(Math.floor((date - now) / 86400000), 'days')
+            console.log(Math.floor((date - now) / 604800000), 'weeks')
+            console.log(Math.floor((date - now) / 2419200000), 'months')
+            console.log(Math.floor((date - now) / 29030400000), 'years')
+
+
+            interval = window.setInterval(console.log('a second has passed'), 1000);
+            console.log(name, date, 'timothy')
+            // setInterval(cb, 1000)
+
+
+
 
 
         };
@@ -59,26 +74,37 @@
             var eventName = document.getElementById("event-name").value;
             var eventTime = document.getElementById("event-time").value || "00:00";
             var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+            var nameValid = false;
+            var dateValid = true;
 
                 if (!eventName) {
+                    nameValid = false;
                     document.getElementById("event-name-error").innerHTML = 'You must provide an event name';
                 } else {
+                    nameValid = true;
                     document.getElementById("event-name-error").innerHTML = '';
                 }
 
                 if (!eventDate) {
+                    dateValid = false;
                     document.getElementById("event-date-error").innerHTML = 'You must provide an event date';
                 } else {
                     if ((eventDate - Date.now()) < 0) {
+                        dateValid = false;
                         document.getElementById("event-date-error").innerHTML = 'You cannot enter a date in the past';
                     } else if (eventDate > (Date.now() + threeYrInMils)) {
+                        dateValid = false;
                         document.getElementById("event-date-error").innerHTML = 'You cannot enter a date more than 3 years in the future';
                     } else {
-                    document.getElementById("event-date-error").innerHTML = '';
+                        dateValid = true;
+                        document.getElementById("event-date-error").innerHTML = '';
                     }
                 }
-                // return;
-            addTimer(eventName, eventDate);
+            if (nameValid, dateValid) {
+                createTimer(eventName, eventDate);
+            }  
+                
+
         }
         // console.log(JSON.parse(localStorage.yourObject) || {});
         console.log(localStorage);
@@ -96,16 +122,5 @@
             console.log(foo);
             // console.log(foo.getMinutes());
         }
-
-
-
-
-
-        //     var eventTime = document.getElementById("event-time").value || '00:00'
-
-        //     document.getElementById("timer-date").innerHTML = eventDate
-        //     document.getElementById("timer-time").innerHTML = eventTime
-        //     document.getElementById("countdown").innerHTML = `${eventName}: `
-        // }
     </script>
 </html>
