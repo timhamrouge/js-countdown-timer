@@ -30,9 +30,69 @@
 </body>
     <script>
 
-        // function cb () {
-        //     console.log('a second has passed')
-        // }
+        function cb (years, months, weeks, days, hours, minutes, seconds) {
+            console.log(years, ' years,', months, ' months,', weeks, ' weeks,', days, ' days,', hours, ' hours,', minutes, ' + minutes,', seconds, ' seconds',);
+        };
+
+        let threeYrInMils = 94670856000;
+
+        function createTimer(name, date) {
+            let now = Date.now()
+            let years, months, weeks, days, hours, minutes, seconds;
+            let milisecondsUntil = date - now;
+            let timeLeft
+
+            if (Math.floor(milisecondsUntil / 29030400000) > 0) {
+                years = Math.floor(milisecondsUntil / 29030400000)
+                timeLeft = milisecondsUntil % 29030400000;
+            }
+            
+            if (!timeLeft) timeLeft = milisecondsUntil;
+
+            if ((Math.floor(timeLeft / 2419200000)) > 0) {
+                months = Math.floor(timeLeft / 2419200000) 
+                timeLeft = timeLeft % 2419200000;
+            }
+
+            if (!timeLeft) timeLeft = milisecondsUntil;
+
+            if ((Math.floor(timeLeft / 604800000)) > 0) {
+                weeks = Math.floor(timeLeft / 604800000) 
+                timeLeft = timeLeft % 604800000;
+            }
+
+            if (!timeLeft) timeLeft = milisecondsUntil;
+
+            if ((Math.floor(timeLeft / 86400000)) > 0) {
+                days = Math.floor(timeLeft / 86400000) 
+                timeLeft = timeLeft % 86400000;
+            }
+
+            if (!timeLeft) timeLeft = milisecondsUntil;
+
+            if ((Math.floor(timeLeft / 3600000)) > 0) {
+                hours = Math.floor(timeLeft / 3600000) 
+                timeLeft = timeLeft % 3600000;
+            }
+
+            if (!timeLeft) timeLeft = milisecondsUntil;
+
+            if ((Math.floor(timeLeft / 60000)) > 0) {
+                minutes = Math.floor(timeLeft / 60000) 
+                timeLeft = timeLeft % 60000;
+            }
+
+            if (!timeLeft) timeLeft = milisecondsUntil;
+
+            if ((Math.floor(timeLeft / 1000)) > 0) {
+                seconds = Math.floor(timeLeft / 1000) 
+                timeLeft = timeLeft % 1000;
+            }
+
+            console.log(years, months, days, hours, minutes, seconds);
+
+
+            setInterval(() => cb(years, months, weeks, days, hours, minutes, seconds), 1000);
         // window.onload = function() {
         //     setInterval(cb, 1000)
         // }
@@ -42,27 +102,39 @@
         // use localStorage to set timers
         // format milisecond for eventDate into actual date
         //
+        // interval = window.setInterval(console.log('a second has passed'), 1000);
+            console.log(name, date, 'timothy')
+            setInterval(cb, 1000)
 
-        let threeYrInMils = 94670856000;
 
-        function createTimer(name, date) {
-            let now = Date.now()
-            console.log(date, now, date - now);
+            
 
-            // subtract each from the next 
 
-            console.log(Math.floor((date - now) / 1000), 'seconds')
+
+            // console.log(months);
+            if ((Math.floor(milisecondsUntil / 604800000)) > 0) weeks = Math.floor((milisecondsUntil) % 604800000)
+            // console.log(weeks);
+            if ((Math.floor(milisecondsUntil / 86400000)) > 0) days = Math.floor((milisecondsUntil) % 86400000)
+            // console.log(days);
+            if ((Math.floor(milisecondsUntil / 3600000)) > 0) hours = Math.floor((milisecondsUntil) % 3600000)
+            // console.log(hours)
+            if ((Math.floor(milisecondsUntil / 60000)) > 0) minutes = Math.floor((milisecondsUntil) % 60000)
+            // console.log(minutes);
+
+
+
+
+            console.log((date - now) / 1000, 'seconds')
             console.log(Math.floor((date - now) / 60000), 'minutes')
             console.log(Math.floor((date - now) / 3600000), 'hours')
             console.log(Math.floor((date - now) / 86400000), 'days')
             console.log(Math.floor((date - now) / 604800000), 'weeks')
             console.log(Math.floor((date - now) / 2419200000), 'months')
             console.log(Math.floor((date - now) / 29030400000), 'years')
+            console.log(Math.floor(milisecondsUntil) % 1000, 'seconds?')
 
 
-            interval = window.setInterval(console.log('a second has passed'), 1000);
-            console.log(name, date, 'timothy')
-            // setInterval(cb, 1000)
+
 
 
 
