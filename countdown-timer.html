@@ -26,6 +26,9 @@
     <p id="timer-date"></p>
     <p id="timer-time"></p>
     <p id="countdown"></p>
+    <div id="countdownHolder">
+
+    </div>
 
 </body>
     <script>
@@ -38,7 +41,20 @@
         var threeYrInMils = 94670856000;
 
         function createTimer(name, date) {
+            workOutTimeLeft(name, date);
             var foo = setInterval(() => workOutTimeLeft(name, date), 1000)
+        }
+
+        function formatTime(num){
+            var unitStr;
+            if (num >= 10) {
+                    unitStr = num
+                } else if (num < 10) {
+                    console.log('less than 10')
+                    unitStr = "0" + num
+                    console.log(unitStr)
+                }
+                return unitStr;
         }
 
         function workOutTimeLeft(name, date) {
@@ -51,7 +67,10 @@
             if (Math.floor(milisecondsUntil / 29030400000) > 0) {
                 years = Math.floor(milisecondsUntil / 29030400000)
                 timeLeft = milisecondsUntil % 29030400000;
-                countdownString = years + ' years,'
+                var yearsStr = formatTime(years);
+                countdownString += (yearsStr + (yearsStr !== "01" ? " years, " : " year, "));
+            } else {
+                countdownString += ("00 years")
             }
             
             if (!timeLeft) timeLeft = milisecondsUntil;
@@ -59,8 +78,10 @@
             if ((Math.floor(timeLeft / 2419200000)) > 0) {
                 months = Math.floor(timeLeft / 2419200000) 
                 timeLeft = timeLeft % 2419200000;
-                countdownString += months + ' months,'
-
+                var monthsStr = formatTime(months);
+                countdownString += (monthsStr + (monthsStr !== "01" ? " months, " : " month, "));
+            } else {
+                countdownString += ("00 months")
             }
 
             if (!timeLeft) timeLeft = milisecondsUntil;
@@ -68,8 +89,10 @@
             if ((Math.floor(timeLeft / 604800000)) > 0) {
                 weeks = Math.floor(timeLeft / 604800000) 
                 timeLeft = timeLeft % 604800000;
-                countdownString += weeks + ' weeks,'
-
+                var weeksStr = formatTime(weeks);
+                countdownString += (weeksStr + (weeksStr !== "01" ? " weeks, " : " week, "));
+            } else {
+                countdownString += ("00 weeks")
             }
 
             if (!timeLeft) timeLeft = milisecondsUntil;
@@ -77,8 +100,11 @@
             if ((Math.floor(timeLeft / 86400000)) > 0) {
                 days = Math.floor(timeLeft / 86400000) 
                 timeLeft = timeLeft % 86400000;
-                countdownString += days + ' days,'
-
+                var daysStr = formatTime(days);
+                countdownString += (daysStr + (daysStr !== "01" ? " days, " : " day, "));
+            } else {
+                console.log((Math.floor(timeLeft / 86400000)), 'dis')
+                countdownString += ("00 days")
             }
 
             if (!timeLeft) timeLeft = milisecondsUntil;
@@ -86,8 +112,10 @@
             if ((Math.floor(timeLeft / 3600000)) > 0) {
                 hours = Math.floor(timeLeft / 3600000) 
                 timeLeft = timeLeft % 3600000;
-                countdownString += hours + ' hours,'
-
+                var hoursStr = formatTime(hours);
+                countdownString += (hoursStr + (hoursStr !== "01" ? " hours, " : " hour, "));
+            } else {
+                countdownString += ("00 hours")
             }
 
             if (!timeLeft) timeLeft = milisecondsUntil;
@@ -95,8 +123,10 @@
             if ((Math.floor(timeLeft / 60000)) > 0) {
                 minutes = Math.floor(timeLeft / 60000) 
                 timeLeft = timeLeft % 60000;
-                countdownString += minutes + ' minutes,'
-
+                var minutesStr = formatTime(minutes);
+                countdownString += (minutesStr + (minutesStr !== "01" ? " minutes, " : " minute, "));
+            } else {
+                countdownString += ("00 minutes")
             }
 
             if (!timeLeft) timeLeft = milisecondsUntil;
@@ -104,11 +134,13 @@
             if ((Math.floor(timeLeft / 1000)) > 0) {
                 seconds = Math.floor(timeLeft / 1000) 
                 timeLeft = timeLeft % 1000;
-                countdownString += seconds + ' seconds,'
-
+                var secondsStr = formatTime(seconds);
+                countdownString += (secondsStr + (secondsStr !== "01" ? " seconds" : " second"));
+            } else {
+                countdownString += ("00 seconds")
             }
 
-            document.getElementById("countdown").innerHTML = countdownString;
+            document.getElementById("countdownHolder").innerHTML = `${name}: ${countdownString}`;
             console.log(years, months, weeks, days, hours, minutes, seconds);
 
 
@@ -126,6 +158,7 @@
             console.log(name, date, 'timothy')
 
         };
+
 
         function validateInputs() {
             var eventName = document.getElementById("event-name").value;
@@ -158,7 +191,8 @@
                     }
                 }
             if (nameValid, dateValid) {
-                dates.eventName = eventDate;
+                // check if name and timestamp already exists on dates object
+                dates[eventName] = eventDate;
                 createTimer(eventName, eventDate);
             }  
         }
