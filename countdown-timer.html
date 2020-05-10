@@ -26,122 +26,134 @@
     <p id="timer-date"></p>
     <p id="timer-time"></p>
     <p id="countdown"></p>
-    <div id="countdownHolder">
+    <div id="countdownsHolder">
 
     </div>
 
 </body>
     <script>
+
         var dates = {};
+        var foo;
+        var timers = [];
 
-        function cb (years, months, weeks, days, hours, minutes, seconds) {
-            console.log(years, ' years,', months, ' months,', weeks, ' weeks,', days, ' days,', hours, ' hours,', minutes, ' + minutes,', seconds, ' seconds',);
-        };
-
-        var threeYrInMils = 94670856000;
-
-        function createTimer(name, date) {
-            workOutTimeLeft(name, date);
-            var foo = setInterval(() => workOutTimeLeft(name, date), 1000)
+        function updateDOMElement(elementID, val) {
+            document.getElementById(`event-${elementID}-error`).innerHTML = val;
         }
 
-        function formatTime(num){
-            var unitStr;
-            if (num >= 10) {
-                    unitStr = num
-                } else if (num < 10) {
-                    console.log('less than 10')
-                    unitStr = "0" + num
-                    console.log(unitStr)
+        function validateName(nameString) {
+            if (!nameString) {
+                    updateDOMElement("name", "You must provide an event name");
+                    return false;
+            } else if (Object.keys(dates).includes(nameString)){
+                updateDOMElement("name", "A timer with that name already exists.");
+                    return false;
+                } else {
+                    updateDOMElement("name", "");
+                    return true;
                 }
-                return unitStr;
+        }
+
+        function validateDate(timestamp) {
+            if (!timestamp) {
+                    updateDOMElement("date", "You must provide an event date");
+                    return false;
+                } else {
+                    if ((timestamp - Date.now()) < 0) {
+                        updateDOMElement("date", "You cannot enter a date in the past");
+                        return false;
+                        
+                    } else if (timestamp > (Date.now() + 8640000000)) {
+                        updateDOMElement("date", "You cannot enter a date that far in the future");
+                        return false;
+                        
+                    } else if (Object.values(dates).find(obj => { return obj.date === timestamp})){
+                        updateDOMElement("date", "A countdown to that date already exists");
+                        return false;
+                        
+                    } else {
+                        updateDOMElement("date", "");
+                        return true;
+                    }
+                }
+        }
+
+        // function createCountdown() {
+        //     var eventTime = document.getElementById("event-time").value || "00:00";
+        //     var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+        //     var nameValid = validateName(document.getElementById("event-name").value);
+        //     var dateValid = validateDate(eventDate);
+
+        //     if (nameValid, dateValid) {
+        //         // check if name and timestamp already exists on dates object
+        //         dates[eventName] = eventDate;
+        //         createTimer(eventName, eventDate);
+        //     }  
+
+        // }
+
+        function validateInputs() {
+            var eventName = document.getElementById("event-name").value;
+            var eventTime = document.getElementById("event-time").value || "00:00";
+            var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+            var nameValid = validateName(eventName);
+            var dateValid = validateDate(eventDate);
+
+            if (nameValid, dateValid) {
+                console.log('valid');
+                // check if name and timestamp already exists on dates object
+                // dates.push({name: eventName, date: eventDate});
+                dates[eventName] = eventDate;
+                createTimers(eventName, eventDate);
+            }  
+        }
+
+
+        function createTimers() {
+            timers.forEach(timer => {
+                console.log(timer)
+                clearInterval(timer.timer)
+            })
+            for (let [key, value] of Object.entries(dates)) {
+                timers.push({name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
+            }
+            // timers = dates.map(date => {
+            //     console.log(date);
+            //     return { name : date.name, timer : setInterval(() => workOutTimeLeft(date.name, date.date), 1000) };
+            // })
+            // workOutTimeLeft(name, date);
+            // foo = setInterval(() => workOutTimeLeft(name, date), 1000)
+        }
+
+        function addNewCountdownDiv(name, date) {
+
         }
 
         function workOutTimeLeft(name, date) {
             let now = Date.now()
-            let countdownString;
+            let countdownString = '';
             let years, months, weeks, days, hours, minutes, seconds;
             let milisecondsUntil = date - now;
-            let timeLeft
 
-            if (Math.floor(milisecondsUntil / 29030400000) > 0) {
-                years = Math.floor(milisecondsUntil / 29030400000)
-                timeLeft = milisecondsUntil % 29030400000;
-                var yearsStr = formatTime(years);
-                countdownString += (yearsStr + (yearsStr !== "01" ? " years, " : " year, "));
-            } else {
-                countdownString += ("00 years")
-            }
-            
-            if (!timeLeft) timeLeft = milisecondsUntil;
+            days = Math.floor(milisecondsUntil / (1000 * 60 * 60 * 24))
+            hours = Math.floor((milisecondsUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            minutes = Math.floor((milisecondsUntil % (1000 * 60 * 60)) / (1000 * 60));
+            seconds = Math.floor((milisecondsUntil % (1000 * 60)) / 1000);
 
-            if ((Math.floor(timeLeft / 2419200000)) > 0) {
-                months = Math.floor(timeLeft / 2419200000) 
-                timeLeft = timeLeft % 2419200000;
-                var monthsStr = formatTime(months);
-                countdownString += (monthsStr + (monthsStr !== "01" ? " months, " : " month, "));
+            // console.log(weeks, days, hours, minutes, seconds)
+
+            // console.log(countdownString);
+
+            if(!document.getElementById(`${name}-countdown-timer`)) {
+                let countdownDiv = document.createElement("div")
+                countdownDiv.setAttribute("id", `${name}-countdown-timer`)
+                countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
+                document.getElementById("countdownsHolder").appendChild(countdownDiv)
             } else {
-                countdownString += ("00 months")
+                document.getElementById(`${name}-countdown-timer`).innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
             }
 
-            if (!timeLeft) timeLeft = milisecondsUntil;
-
-            if ((Math.floor(timeLeft / 604800000)) > 0) {
-                weeks = Math.floor(timeLeft / 604800000) 
-                timeLeft = timeLeft % 604800000;
-                var weeksStr = formatTime(weeks);
-                countdownString += (weeksStr + (weeksStr !== "01" ? " weeks, " : " week, "));
-            } else {
-                countdownString += ("00 weeks")
-            }
-
-            if (!timeLeft) timeLeft = milisecondsUntil;
-
-            if ((Math.floor(timeLeft / 86400000)) > 0) {
-                days = Math.floor(timeLeft / 86400000) 
-                timeLeft = timeLeft % 86400000;
-                var daysStr = formatTime(days);
-                countdownString += (daysStr + (daysStr !== "01" ? " days, " : " day, "));
-            } else {
-                console.log((Math.floor(timeLeft / 86400000)), 'dis')
-                countdownString += ("00 days")
-            }
-
-            if (!timeLeft) timeLeft = milisecondsUntil;
-
-            if ((Math.floor(timeLeft / 3600000)) > 0) {
-                hours = Math.floor(timeLeft / 3600000) 
-                timeLeft = timeLeft % 3600000;
-                var hoursStr = formatTime(hours);
-                countdownString += (hoursStr + (hoursStr !== "01" ? " hours, " : " hour, "));
-            } else {
-                countdownString += ("00 hours")
-            }
-
-            if (!timeLeft) timeLeft = milisecondsUntil;
-
-            if ((Math.floor(timeLeft / 60000)) > 0) {
-                minutes = Math.floor(timeLeft / 60000) 
-                timeLeft = timeLeft % 60000;
-                var minutesStr = formatTime(minutes);
-                countdownString += (minutesStr + (minutesStr !== "01" ? " minutes, " : " minute, "));
-            } else {
-                countdownString += ("00 minutes")
-            }
-
-            if (!timeLeft) timeLeft = milisecondsUntil;
-
-            if ((Math.floor(timeLeft / 1000)) > 0) {
-                seconds = Math.floor(timeLeft / 1000) 
-                timeLeft = timeLeft % 1000;
-                var secondsStr = formatTime(seconds);
-                countdownString += (secondsStr + (secondsStr !== "01" ? " seconds" : " second"));
-            } else {
-                countdownString += ("00 seconds")
-            }
-
-            document.getElementById("countdownHolder").innerHTML = `${name}: ${countdownString}`;
-            console.log(years, months, weeks, days, hours, minutes, seconds);
+            // console.log(years, months, weeks, days, hours, minutes, seconds);
 
 
             // setInterval(() => cb(years, months, weeks, days, hours, minutes, seconds), 1000);
@@ -155,62 +167,18 @@
         // format milisecond for eventDate into actual date
         //
         // interval = window.setInterval(console.log('a second has passed'), 1000);
-            console.log(name, date, 'timothy')
+            // console.log(name, date, 'timothy')
 
         };
 
 
-        function validateInputs() {
-            var eventName = document.getElementById("event-name").value;
-            var eventTime = document.getElementById("event-time").value || "00:00";
-            var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
-            var nameValid = false;
-            var dateValid = true;
 
-                if (!eventName) {
-                    nameValid = false;
-                    document.getElementById("event-name-error").innerHTML = 'You must provide an event name';
-                } else {
-                    nameValid = true;
-                    document.getElementById("event-name-error").innerHTML = '';
-                }
-
-                if (!eventDate) {
-                    dateValid = false;
-                    document.getElementById("event-date-error").innerHTML = 'You must provide an event date';
-                } else {
-                    if ((eventDate - Date.now()) < 0) {
-                        dateValid = false;
-                        document.getElementById("event-date-error").innerHTML = 'You cannot enter a date in the past';
-                    } else if (eventDate > (Date.now() + threeYrInMils)) {
-                        dateValid = false;
-                        document.getElementById("event-date-error").innerHTML = 'You cannot enter a date more than 3 years in the future';
-                    } else {
-                        dateValid = true;
-                        document.getElementById("event-date-error").innerHTML = '';
-                    }
-                }
-            if (nameValid, dateValid) {
-                // check if name and timestamp already exists on dates object
-                dates[eventName] = eventDate;
-                createTimer(eventName, eventDate);
-            }  
-        }
         // console.log(JSON.parse(localStorage.yourObject) || {});
         console.log(localStorage);
         // var obj = JSON.parse(localStorage.yourObject || {});
         // console.log(obj, 'here is obj');
         function clearStorage() {
             delete localStorage.yourObject;
-        }
-
-        function parseDate () {
-            // need to show error/warning message for when the date is overflow - more than 999 days?
-            // last 2 digits of the below is miliseconds, trim that, 3rd and 4th last is seconds, always 00
-            console.log(Date.parse(document.getElementById("event-date").value + 'T' + (document.getElementById("event-time").value || '00:00')));
-            var foo = Date.parse(document.getElementById("event-date").value);
-            console.log(foo);
-            // console.log(foo.getMinutes());
         }
     </script>
 </html>
