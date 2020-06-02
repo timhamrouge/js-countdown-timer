@@ -3,194 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <title>Countdown-Timer</title>
 </head>
 <body>
-    <label for="event-name">Event Name</label><br>
-    <input type="text" name="event-name" id="event-name" /><br>
+ <!-- TODO: make a nice responsive title -->
+  <!-- <h1 class="display-3" style="text-align: center;">Countdown Timer</h1> -->
+    <div class="container" style="max-width: 400px;">
+      <label for="event-name">Name:</label>
+        <div class="input-group">
+            <input id="event-name" type="text" class="form-control" placeholder="Event name" aria-label="Event Name">
+          </div>
     <p id="event-name-error" style="color: red;"></p>
 
-    <label for="event-date" id="event-date-label">Event Date</label><br>
-    <input type="date" name="event-date" id="event-date" /><br>
+    <label for="event-date">Date:</label><br>
+    <div class="input-group">
+    <input type="date" name="event-date" id="event-date" class="form-control" /><br>
+  </div>
+
     <p id="event-date-error" style="color: red;"></p>
 
+    <label for="event-time">Time:</label><br>
+    <div class="input-group mb-3">
+    <input type="time" name="event-time" id="event-time" class="form-control" /><br>
+  </div>
 
-    <!-- <label for="event-time-check" id="event-time-check">Time?</label> -->
-    <label for="event-time" id="event-time-label">Event Time</label><br>
-    <!-- <input type="checkbox" id="time-checkbox" name="time-checkbox" onclick="handleTimeFIeld()"><br> -->
-    <input type="time" name="event-time" id="event-time"/><br>
-    <input type="submit" value="Set Timer" onclick="validateInputs()"/>
-    <input type="button" value="clear stored timers" onclick="clearStorage()"/>
+  <button type="button" class="btn btn-success float-right" onclick="validateInputs()">Start Countdown</button>
+  <button type="button" class="btn btn-secondary float-left" onclick="clearStorage()">Clear Timers</button>
+</div>
 
-    <p id="timer-name"></p>
-    <p id="timer-date"></p>
-    <p id="timer-time"></p>
-    <p id="countdown"></p>
+<div class="container" style="margin-top: 100px;">
     <div id="countdownsHolder">
-
     </div>
-
+    <div class="card">
+      <div class="card-header">
+        Countdowns
+      </div>
+      <ul id="countdown-list" class="list-group list-group-flush">
+        <li class="list-group-item">No countdowns set</li>
+      </ul>
+    </div>
+  </div>
 </body>
-<script>
-    
-    var dates = {};
-    var foo;
-    var timers = [];
-    
-    // document.onload = function() {
-    //     dates = 
-    // }
-
-        function updateDOMElement(elementID, val) {
-            document.getElementById(`event-${elementID}-error`).innerHTML = val;
-        }
-
-        function validateName(nameString) {
-            if (!nameString) {
-                    updateDOMElement("name", "You must provide an event name");
-                    return false;
-            } else if (dates[nameString]){
-                updateDOMElement("name", "A timer with that name already exists.");
-                    return false;
-                }
-                    console.log('trig in else')
-                    updateDOMElement("name", "");
-                    return true;
-        }
-
-        function validateDate(timestamp) {
-            if (!timestamp) {
-                    updateDOMElement("date", "You must provide an event date");
-                    return false;
-                } else {
-                    if ((timestamp - Date.now()) < 0) {
-                        updateDOMElement("date", "You cannot enter a date in the past");
-                        return false;
-                        
-                    } else if (timestamp > (Date.now() + 8640000000)) {
-                        updateDOMElement("date", "You cannot enter a date that far in the future");
-                        return false;
-                        
-                    } else if (Object.values(dates).includes(timestamp)){
-                        updateDOMElement("date", "A countdown to that date already exists");
-                        return false;
-                        
-                    } else {
-                        updateDOMElement("date", "");
-                        return true;
-                    }
-                }
-        }
-
-        // function createCountdown() {
-        //     var eventTime = document.getElementById("event-time").value || "00:00";
-        //     var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
-        //     var nameValid = validateName(document.getElementById("event-name").value);
-        //     var dateValid = validateDate(eventDate);
-
-        //     if (nameValid, dateValid) {
-        //         // check if name and timestamp already exists on dates object
-        //         dates[eventName] = eventDate;
-        //         createTimer(eventName, eventDate);
-        //     }  
-
-        // }
-
-        function validateInputs() {
-            var eventName = document.getElementById("event-name").value;
-            var eventTime = document.getElementById("event-time").value || "00:00";
-            var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
-            var nameValid = validateName(eventName);
-            var dateValid = validateDate(eventDate);
-            
-            console.log(nameValid, ' - name, ', dateValid, ' -date')
-
-            if (nameValid && dateValid) {
-                console.log('valid');
-                // check if name and timestamp already exists on dates object
-                // dates.push({name: eventName, date: eventDate});
-                dates[eventName] = eventDate;
-                createTimers(eventName, eventDate);
-            }  
-        }
-
-
-        function createTimers() {
-            timers.forEach(timer => {
-                console.log(timer)
-                clearInterval(timer.timer)
-            })
-            for (let [key, value] of Object.entries(dates)) {
-                timers.push({name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
-            }
-            // timers = dates.map(date => {
-            //     console.log(date);
-            //     return { name : date.name, timer : setInterval(() => workOutTimeLeft(date.name, date.date), 1000) };
-            // })
-            // workOutTimeLeft(name, date);
-            // foo = setInterval(() => workOutTimeLeft(name, date), 1000)
-        }
-
-        function addNewCountdownDiv(name, date) {
-
-        }
-
-        function workOutTimeLeft(name, date) {
-            let now = Date.now()
-            let countdownString = '';
-            let years, months, weeks, days, hours, minutes, seconds;
-            let milisecondsUntil = date - now;
-
-            days = Math.floor(milisecondsUntil / (1000 * 60 * 60 * 24))
-            hours = Math.floor((milisecondsUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            minutes = Math.floor((milisecondsUntil % (1000 * 60 * 60)) / (1000 * 60));
-            seconds = Math.floor((milisecondsUntil % (1000 * 60)) / 1000);
-
-            // console.log(weeks, days, hours, minutes, seconds)
-
-            // console.log(countdownString);
-
-            if(!document.getElementById(`${name}-countdown-timer`)) {
-                let countdownDiv = document.createElement("div");
-                let saveButton = document.createElement("BUTTON");
-                saveButton.innerHTML = "Save";
-                countdownDiv.setAttribute("id", `${name}-countdown-timer`)
-                countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
-                console.log(document.getElementById(`${name}-countdown-timer`));
-                countdownDiv.appendChild(saveButton)
-                document.getElementById("countdownsHolder").appendChild(countdownDiv)
-
-                document.getElementById("countdownsHolder").appendChild(countdownDiv)
-            } else {
-                document.getElementById(`${name}-countdown-timer`).innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
-            }
-
-            // console.log(years, months, weeks, days, hours, minutes, seconds);
-
-
-            // setInterval(() => cb(years, months, weeks, days, hours, minutes, seconds), 1000);
-        // window.onload = function() {
-        //     setInterval(cb, 1000)
-        // }
-        // var interval;
-        // TODO
-        // use clearInterval and setInterval for the countdown
-        // use localStorage to set timers
-        // format milisecond for eventDate into actual date
-        //
-        // interval = window.setInterval(console.log('a second has passed'), 1000);
-            // console.log(name, date, 'timothy')
-
-        };
-
-
-
-        // console.log(JSON.parse(localStorage.yourObject) || {});
-        console.log(localStorage);
-        // var obj = JSON.parse(localStorage.yourObject || {});
-        // console.log(obj, 'here is obj');
-        function clearStorage() {
-            delete localStorage.yourObject;
-        }
-    </script>
+<script src="countdown-timer.js"></script>
 </html>
