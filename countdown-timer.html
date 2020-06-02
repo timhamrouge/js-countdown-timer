@@ -31,11 +31,15 @@
     </div>
 
 </body>
-    <script>
-
-        var dates = {};
-        var foo;
-        var timers = [];
+<script>
+    
+    var dates = {};
+    var foo;
+    var timers = [];
+    
+    // document.onload = function() {
+    //     dates = 
+    // }
 
         function updateDOMElement(elementID, val) {
             document.getElementById(`event-${elementID}-error`).innerHTML = val;
@@ -45,13 +49,13 @@
             if (!nameString) {
                     updateDOMElement("name", "You must provide an event name");
                     return false;
-            } else if (Object.keys(dates).includes(nameString)){
+            } else if (dates[nameString]){
                 updateDOMElement("name", "A timer with that name already exists.");
                     return false;
-                } else {
+                }
+                    console.log('trig in else')
                     updateDOMElement("name", "");
                     return true;
-                }
         }
 
         function validateDate(timestamp) {
@@ -67,7 +71,7 @@
                         updateDOMElement("date", "You cannot enter a date that far in the future");
                         return false;
                         
-                    } else if (Object.values(dates).find(obj => { return obj.date === timestamp})){
+                    } else if (Object.values(dates).includes(timestamp)){
                         updateDOMElement("date", "A countdown to that date already exists");
                         return false;
                         
@@ -98,8 +102,10 @@
             var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
             var nameValid = validateName(eventName);
             var dateValid = validateDate(eventDate);
+            
+            console.log(nameValid, ' - name, ', dateValid, ' -date')
 
-            if (nameValid, dateValid) {
+            if (nameValid && dateValid) {
                 console.log('valid');
                 // check if name and timestamp already exists on dates object
                 // dates.push({name: eventName, date: eventDate});
@@ -145,9 +151,15 @@
             // console.log(countdownString);
 
             if(!document.getElementById(`${name}-countdown-timer`)) {
-                let countdownDiv = document.createElement("div")
+                let countdownDiv = document.createElement("div");
+                let saveButton = document.createElement("BUTTON");
+                saveButton.innerHTML = "Save";
                 countdownDiv.setAttribute("id", `${name}-countdown-timer`)
                 countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
+                console.log(document.getElementById(`${name}-countdown-timer`));
+                countdownDiv.appendChild(saveButton)
+                document.getElementById("countdownsHolder").appendChild(countdownDiv)
+
                 document.getElementById("countdownsHolder").appendChild(countdownDiv)
             } else {
                 document.getElementById(`${name}-countdown-timer`).innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
