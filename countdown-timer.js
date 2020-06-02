@@ -61,7 +61,7 @@
                         
                     } else {
                         updateDOMElementInnerHTML("date", "");
-                    updateDOMElementColour("name", "1px solid #ced4da");
+                    updateDOMElementColour("date", "1px solid #ced4da");
 
                         return true;
                     }
@@ -116,9 +116,9 @@
             // workOutTimeLeft(name, date);
             // foo = setInterval(() => workOutTimeLeft(name, date), 1000)
         }
-
-        function addNewCountdownDiv(name, date) {
-
+        function removeDOMElement(name) {
+            var element = document.getElementById(`${name}-countdown-timer`);
+            element.parentNode.removeChild(element);
         }
 
         function workOutTimeLeft(name, date) {
@@ -142,16 +142,19 @@
 
             if(!document.getElementById(`${name}-countdown-timer`)) {
                 let countdownLi = document.createElement("li");
-                // let saveButton = document.createElement("BUTTON");
-                // saveButton.innerHTML = "Save";
-                countdownLi.setAttribute("id", `${name}-countdown-timer`)
+                let deleteButton = document.createElement("BUTTON");
+                deleteButton.onclick = () => removeDOMElement(name)
+                let countdownDiv = document.createElement("div");
+                deleteButton.innerHTML = '<i class="far fa-window-close"></i>';
+                countdownDiv.setAttribute("id", `${name}-countdown-timer`)
                 countdownLi.setAttribute("class", "list-group-item");
 
-                countdownLi.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
+                countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
                 // console.log(document.getElementById(`${name}-countdown-timer`));
+                countdownLi.appendChild(countdownDiv);
+                countdownLi.appendChild(deleteButton);
                 document.getElementById("countdown-list").appendChild(countdownLi);
 
-                // document.getElementById("countdownsHolder").appendChild(countdownDiv)
             } else {
                 document.getElementById(`${name}-countdown-timer`).innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
             }
