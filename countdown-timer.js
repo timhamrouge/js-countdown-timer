@@ -3,9 +3,31 @@ var dates = {};
 var foo;
 var timers = [];
 
-// document.onload = function() {
-//     dates = 
-// }
+
+// TODO:
+// Disable save button after timer has been saved - do not add a save button to the timer li after it has been created from localstorage
+// update general styling
+// Have clear TImers button call clearStorage() and delete all timers. 
+// Test creation and clearing of timers from storage, and saving and delting of timers
+// genral refactoring
+// update the timer finished modal, the timer finished logic, and the modal appearing logic
+
+
+function clearStorage() {
+    delete localStorage.timers;
+}
+
+window.onload = function() {
+    console.log(localStorage)
+    if (localStorage.timers && localStorage.timers.length) {
+        dates = JSON.parse(localStorage.timers)[0]
+        console.log(dates)
+        for (let [key, value] of Object.entries(dates)) {
+            workOutTimeLeft(key, value);
+          }
+        createTimers();
+    }
+}
 
 function updateErrorStyling(elementID, val, colour) {
     document.getElementById(`event-${elementID}-error`).innerHTML = val;
@@ -78,6 +100,19 @@ function removeDOMElement(id, name) {
     const countdownList = document.getElementById('countdown-list');
 
     if (name) {
+        if(localStorage.timers && localStorage.timers.length) {
+            if (Object.keys(JSON.parse(localStorage.timers)[0]).includes(name)) {
+                let obj = JSON.parse(localStorage.timers)[0];
+                delete obj[name];
+                if (Object.keys(obj).length) {
+                    localStorage.timers = JSON.stringify([obj]);
+                } else {
+                    clearStorage();
+                }
+            }
+            console.log(Object.keys(JSON.parse(localStorage.timers)[0]));
+            // if (Object.keys(JSON.parse(localStorage.timers[])))
+        }
         delete dates[name];
         clearInterval(timers.find(timer => timer.name === name).timer)
         timers = timers.filter(timer => timer.name != name);
@@ -104,6 +139,14 @@ function saveTimer(name) {
     let obj = {};
     obj[name] = dates[name];
 
+    console.log(obj, 'obj')
+
+    if (localStorage.timers && localStorage.timers.length) {
+        let timersInStorage = JSON.parse(localStorage.timers)[0]
+        obj = Object.assign(timersInStorage, obj)
+        
+    }
+
     localStorage.timers = JSON.stringify([obj])
 
 }
@@ -112,9 +155,6 @@ function saveTimer(name) {
 // console.log(localStorage);
 // var obj = JSON.parse(localStorage.yourObject || {});
 // console.log(obj, 'here is obj');
-function clearStorage() {
-    delete localStorage.timers;
-}
 
 function workOutTimeLeft(name, date) {
     let now = Date.now()
@@ -157,7 +197,6 @@ function workOutTimeLeft(name, date) {
         let countdownDiv = document.createElement("div");
         countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
 
-        // deleteButton.innerHTML = '<i class="far fa-window-close"></i>';
         deleteButton.innerHTML = 'X';
         saveButton.innerHTML = 'Save';
 
