@@ -155,6 +155,11 @@ function saveTimer(name) {
 // var obj = JSON.parse(localStorage.yourObject || {});
 // console.log(obj, 'here is obj');
 
+function stopAudio() {
+    var audio = document.getElementById("alert")
+    audio.pause();
+}
+
 function workOutTimeLeft(name, date) {
     let now = Date.now()
 
@@ -166,6 +171,7 @@ function workOutTimeLeft(name, date) {
         document.getElementById("exampleModalLabel").innerHTML = name;
         $("#exampleModal").modal();
         var audio = document.getElementById("alert")
+        audio.currentTime = 0;
         audio.play();
     }
     let days, hours, minutes, seconds;
