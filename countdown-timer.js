@@ -100,6 +100,22 @@ function removeDOMElement(id, name) {
     }
 }
 
+function saveTimer(name) {
+    let obj = {};
+    obj[name] = dates[name];
+
+    localStorage.timers = JSON.stringify([obj])
+
+}
+
+// console.log(JSON.parse(localStorage.yourObject) || {});
+// console.log(localStorage);
+// var obj = JSON.parse(localStorage.yourObject || {});
+// console.log(obj, 'here is obj');
+function clearStorage() {
+    delete localStorage.timers;
+}
+
 function workOutTimeLeft(name, date) {
     let now = Date.now()
 
@@ -135,28 +151,26 @@ function workOutTimeLeft(name, date) {
         let deleteButton = document.createElement("BUTTON");
         deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
 
+        let saveButton = document.createElement("BUTTON");
+        saveButton.onclick = () => saveTimer(name);
+
         let countdownDiv = document.createElement("div");
         countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
 
-        deleteButton.innerHTML = '<i class="far fa-window-close"></i>';
+        // deleteButton.innerHTML = '<i class="far fa-window-close"></i>';
+        deleteButton.innerHTML = 'X';
+        saveButton.innerHTML = 'Save';
+
 
         countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
         // console.log(document.getElementById(`${name}-countdown-timer`));
         countdownLi.appendChild(countdownDiv);
         countdownLi.appendChild(deleteButton);
+        countdownLi.appendChild(saveButton);
+
         document.getElementById("countdown-list").appendChild(countdownLi);
 
     } else {
         document.getElementById(`${name}-countdown-timer-div`).innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
     }
 };
-
-
-
-// console.log(JSON.parse(localStorage.yourObject) || {});
-console.log(localStorage);
-// var obj = JSON.parse(localStorage.yourObject || {});
-// console.log(obj, 'here is obj');
-function clearStorage() {
-    delete localStorage.yourObject;
-}
