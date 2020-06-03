@@ -89,7 +89,6 @@ function startTimer() {
 
 function createTimers() {
     timers.forEach(timer => {
-        console.log(timer)
         clearInterval(timer.timer)
     })
     for (let [key, value] of Object.entries(dates)) {
@@ -164,6 +163,7 @@ function workOutTimeLeft(name, date) {
         // handle a timer that has been reached
         // delete timer and have a pop-up, or change the timer somehow
         clearInterval(timers.find(timer => timer.name === name).timer)
+        document.getElementById("exampleModalLabel").innerHTML = name;
         $("#exampleModal").modal();
         var audio = document.getElementById("alert")
         audio.play();
