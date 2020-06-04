@@ -1,5 +1,5 @@
 
-var dates = {};
+var countdowns = {};
 var foo;
 var timers = [];
 
@@ -12,6 +12,33 @@ var timers = [];
 // genral refactoring
 // update the timer finished modal, the timer finished logic, and the modal appearing logic
 
+
+function createCountdown() {
+    const eventName = document.getElementById("event-name").value;
+    const eventTime = document.getElementById("event-time").value || "00:00";
+    const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+
+    if(validateInputs(eventName, eventDate)) {
+        // calculate time remaining
+        countdowns[eventName] = { timestamp: eventDate, interval: null}
+        workOutTimeLeft(eventName, eventDate);
+        createTimers(); // << this calls the above also...
+    }
+}
+
+// create timer LI
+
+function startTimer() {
+    var eventName = document.getElementById("event-name").value;
+    var eventTime = document.getElementById("event-time").value || "00:00";
+    var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+
+    if (validateInputs(eventName, eventDate)) {
+        dates[eventName] = eventDate;
+        workOutTimeLeft(eventName, eventDate);
+        createTimers();
+    }
+}
 
 function clearStorage() {
     delete localStorage.timers;
@@ -74,17 +101,7 @@ function validateInputs(eventName, eventDate) {
     return false;
 }
 
-function startTimer() {
-    var eventName = document.getElementById("event-name").value;
-    var eventTime = document.getElementById("event-time").value || "00:00";
-    var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
 
-    if (validateInputs(eventName, eventDate)) {
-        dates[eventName] = eventDate;
-        workOutTimeLeft(eventName, eventDate);
-        createTimers();
-    }
-}
 
 
 function createTimers() {
@@ -143,44 +160,89 @@ function saveTimer(name) {
     if (localStorage.timers && localStorage.timers.length) {
         let timersInStorage = JSON.parse(localStorage.timers)[0]
         obj = Object.assign(timersInStorage, obj)
-        
     }
 
     localStorage.timers = JSON.stringify([obj])
 
 }
 
-// console.log(JSON.parse(localStorage.yourObject) || {});
-// console.log(localStorage);
-// var obj = JSON.parse(localStorage.yourObject || {});
-// console.log(obj, 'here is obj');
+function deleteTimer(name) {
+    //delete from localStorage if it's there
+
+    clearInterval(timers.find(timer => timer.name === name).timer);
+    timers = timers.filter(timer => timer.name != name);
+    delete dates[name];
+
+    const timerDiv = document.getElementById(`${name}-countdown-timer-div`);
+
+
+
+}
 
 function stopAudio() {
     var audio = document.getElementById("alert")
     audio.pause();
 }
 
+function handleEventReached(name) {
+    console.log(name)
+    // delete the timer, from localstorage and the global object, clear the interval
+}
+
+formatString = (units) => ""+units.padStart(2, "0");
+
+getDays = (timeUntil) => formatString(Math.floor(timeUntil / (1000 * 60 * 60 * 24)));
+getHours = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+getMinutes = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60)));
+getSeconds = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60)) / 1000));
+
+function updateCountdownElement(name) {
+
+}
+
+function calculateTimeRemaining(name, date){    
+    const now = Date.now();
+    const msLeft = date - now;
+    // let days = getDays(msLeft), hours = getHours(msLeft), minutes = getMinutes(msLeft), seconds;
+
+    const countdownElement  = document.getElementById(`${name}-countdown-timer-div`);
+
+    if (!countdownElement) {
+        // call function to create countdown div
+    } else {
+        // the below is fine but we never need to update the name
+        countdownElement.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
+    }
+
+
+    
+
+}
+
+
+
 function workOutTimeLeft(name, date) {
-    let now = Date.now()
+    let now = Date.now();
 
     // don't do this if the modal is already open. But open it after the open modal is closed if another countdown is reached
     if (now > date) {
+        handleEventReached(name);
         // handle a timer that has been reached
         // delete timer and have a pop-up, or change the timer somehow
         clearInterval(timers.find(timer => timer.name === name).timer)
-        document.getElementById("exampleModalLabel").innerHTML = name;
+        document.getElementById("countdown-modal-body").innerHTML = name;
         $("#exampleModal").modal();
         var audio = document.getElementById("alert")
         audio.currentTime = 0;
         audio.play();
     }
     let days, hours, minutes, seconds;
-    let milisecondsUntil = date - now;
+    let timeUntil = date - now;
 
-    days = String(Math.floor(milisecondsUntil / (1000 * 60 * 60 * 24))).padStart(2, "0");
-    hours = String(Math.floor((milisecondsUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
-    minutes = String(Math.floor((milisecondsUntil % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
-    seconds = String(Math.floor((milisecondsUntil % (1000 * 60)) / 1000)).padStart(2, "0");
+    days = getDays(timeUntil);
+    hours = getHours(timeUntil);
+    minutes = getMinutes(timeUntil);
+    seconds = getSeconds(timeUntil);
 
 
     let emptyListItem = document.getElementById('no-countdowns-li');
