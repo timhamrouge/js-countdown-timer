@@ -13,32 +13,6 @@ var timers = [];
 // update the timer finished modal, the timer finished logic, and the modal appearing logic
 
 
-function createCountdown() {
-    const eventName = document.getElementById("event-name").value;
-    const eventTime = document.getElementById("event-time").value || "00:00";
-    const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
-
-    if(validateInputs(eventName, eventDate)) {
-        // calculate time remaining
-        countdowns[eventName] = { timestamp: eventDate, interval: null}
-        workOutTimeLeft(eventName, eventDate);
-        createTimers(); // << this calls the above also...
-    }
-}
-
-// create timer LI
-
-function startTimer() {
-    var eventName = document.getElementById("event-name").value;
-    var eventTime = document.getElementById("event-time").value || "00:00";
-    var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
-
-    if (validateInputs(eventName, eventDate)) {
-        dates[eventName] = eventDate;
-        workOutTimeLeft(eventName, eventDate);
-        createTimers();
-    }
-}
 
 function clearStorage() {
     delete localStorage.timers;
@@ -94,24 +68,6 @@ function validateDate(timestamp) {
     }
 }
 
-function validateInputs(eventName, eventDate) {
-    if (validateName(eventName) && validateDate(eventDate)) {
-        return true;
-    }
-    return false;
-}
-
-
-
-
-function createTimers() {
-    timers.forEach(timer => {
-        clearInterval(timer.timer)
-    })
-    for (let [key, value] of Object.entries(dates)) {
-        timers.push({ name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
-    }
-}
 function removeDOMElement(id, name) {
     const countdownList = document.getElementById('countdown-list');
 
@@ -151,6 +107,67 @@ function removeDOMElement(id, name) {
     }
 }
 
+function stopAudio() {
+    var audio = document.getElementById("alert")
+    audio.pause();
+}
+
+function handleEventReached(name) {
+    console.log(name)
+    // delete the timer, from localstorage and the global object, clear the interval
+}
+
+
+
+
+
+function createCountdown() {
+    const eventName = document.getElementById("event-name").value;
+    const eventTime = document.getElementById("event-time").value || "00:00";
+    const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+
+    if(validateInputs(eventName, eventDate)) {
+        // calculate time remaining
+        countdowns[eventName] = { timestamp: eventDate, interval: null}
+        workOutTimeLeft(eventName, eventDate);
+        createTimers(); // << this calls the above also...
+    }
+}
+
+// create timer LI
+
+function startTimer() {
+    var eventName = document.getElementById("event-name").value;
+    var eventTime = document.getElementById("event-time").value || "00:00";
+    var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+
+    if (validateInputs(eventName, eventDate)) {
+        dates[eventName] = eventDate;
+        workOutTimeLeft(eventName, eventDate);
+        createTimers();
+    }
+}
+
+function validateInputs(eventName, eventDate) {
+    if (validateName(eventName) && validateDate(eventDate)) {
+        return true;
+    }
+    return false;
+}
+
+function createInterval(name, date) {
+    return setInterval(() => calculateTimeRemaining(name, date), 1000);
+}
+
+function createTimers() {
+    timers.forEach(timer => {
+        clearInterval(timer.timer)
+    })
+    for (let [key, value] of Object.entries(dates)) {
+        timers.push({ name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
+    }
+}
+
 function saveTimer(name) {
     let obj = {};
     obj[name] = dates[name];
@@ -179,16 +196,6 @@ function deleteTimer(name) {
 
 }
 
-function stopAudio() {
-    var audio = document.getElementById("alert")
-    audio.pause();
-}
-
-function handleEventReached(name) {
-    console.log(name)
-    // delete the timer, from localstorage and the global object, clear the interval
-}
-
 formatString = (units) => ""+units.padStart(2, "0");
 
 getDays = (timeUntil) => formatString(Math.floor(timeUntil / (1000 * 60 * 60 * 24)));
@@ -196,28 +203,71 @@ getHours = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60 *
 getMinutes = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60)));
 getSeconds = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60)) / 1000));
 
-function updateCountdownElement(name) {
+function handlePlaceholderVisibility() {
+    const element = document.getElementById('no-countdowns-li');
 
 }
 
-function calculateTimeRemaining(name, date){    
+function createCountdownElement(name, units) {
+    const {days, hours, minutes, seconds} = units;
+    let countdownLi = document.createElement("li");
+    countdownLi.setAttribute("id", `${name}-countdown-timer`);
+    countdownLi.setAttribute("class", "list-group-item");
+
+    // let deleteButton = document.createElement("BUTTON");
+    // deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
+
+    // let saveButton = document.createElement("BUTTON");
+    // saveButton.onclick = () => saveTimer(name);
+
+    let countdownDiv = document.createElement("div");
+    countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
+
+    // deleteButton.innerHTML = 'X';
+    // saveButton.innerHTML = 'Save';
+
+
+    countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
+    // console.log(document.getElementById(`${name}-countdown-timer`));
+    countdownLi.appendChild(countdownDiv);
+    // countdownLi.appendChild(deleteButton);
+    // countdownLi.appendChild(saveButton);
+
+    document.getElementById("countdown-list").appendChild(countdownLi);
+}
+
+function updateCountdownElement(element, units) {
+
+}
+
+function calculateTimeRemaining(ms) {
+    return { days: getDays(ms), hours: getHours(ms), minutes: getMinutes(ms), seconds: getSeconds(ms) };
+}
+
+function tickCountdown (name, date) {
     const now = Date.now();
     const msLeft = date - now;
-    // let days = getDays(msLeft), hours = getHours(msLeft), minutes = getMinutes(msLeft), seconds;
+    const countdownElement = document.getElementById(`${name}-countdown-timer-div`);
 
-    const countdownElement  = document.getElementById(`${name}-countdown-timer-div`);
+    const units = calculateTimeRemaining(msLeft);
 
     if (!countdownElement) {
-        // call function to create countdown div
+        createCountdownElement(name, units);
     } else {
-        // the below is fine but we never need to update the name
-        countdownElement.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
+        // this is fine but the name doesn't need to be updated every time
+        countdownElement.innerHTML = `${name}: ${units.days}d ${units.hours}h ${units.minutes}m ${units.seconds}s`;
     }
 
+    // const countdownElement  = document.getElementById(`${name}-countdown-timer-div`);
 
-    
+    // handlePlaceholderVisibility(document.getElementById('no-countdowns-li'));
+};
 
-}
+
+// the interval needs to calculate the time left, and then update the UI
+
+// a function that works out time time units and updates the UI
+// that function needs to know the 
 
 
 
@@ -245,9 +295,9 @@ function workOutTimeLeft(name, date) {
     seconds = getSeconds(timeUntil);
 
 
-    let emptyListItem = document.getElementById('no-countdowns-li');
+    let listPlaceholder = document.getElementById('no-countdowns-li');
 
-    if (emptyListItem) {
+    if (listPlaceholder) {
         removeDOMElement('no-countdowns-li')
     }
 
