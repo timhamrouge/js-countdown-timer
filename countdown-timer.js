@@ -1,7 +1,5 @@
-
 var countdowns = {};
 var foo;
-var timers = [];
 
 
 // TODO:
@@ -12,6 +10,151 @@ var timers = [];
 // genral refactoring
 // update the timer finished modal, the timer finished logic, and the modal appearing logic
 
+
+// THIS IS ALL DONE
+
+
+formatString = (unit) => String(unit).padStart(2, "0");
+
+getDays = (timeUntil) => formatString(Math.floor(timeUntil / (1000 * 60 * 60 * 24)));
+getHours = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+getMinutes = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60)));
+getSeconds = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60)) / 1000));
+
+
+function validateName(nameString) {
+    if (!nameString) {
+        updateErrorStyling("name", "You must provide an event name", "1px solid red");
+        return false;
+    } else if (countdowns[nameString]) {
+        updateErrorStyling("name", "A timer with that name already exists.", "1px solid red");
+        return false;
+    }
+    updateErrorStyling("name", "", "1px solid #ced4da");
+    return true;
+};
+
+function timestampExists(timestamp) {
+    return (Object.entries(countdowns).map(arr => arr[1].timestamp)).includes(timestamp);
+};
+
+function validateDate(timestamp) {
+
+    if (!timestamp) {
+        updateErrorStyling("date", "You must provide an event date", "1px solid red");
+        return false;
+    } else {
+        if ((timestamp - Date.now()) < 0) {
+            updateErrorStyling("date", "You cannot enter a date in the past", "1px solid red");
+            return false;
+        } else if (timestamp > (Date.now() + 8640000000)) {
+            updateErrorStyling("date", "You cannot enter a date that far in the future", "1px solid red");
+            return false;
+        } else if (timestampExists(timestamp)) {
+            updateErrorStyling("date", "A countdown to that date already exists", "1px solid red");
+            return false;
+        } else {
+            updateErrorStyling("date", "", "1px solid #ced4da");
+            return true;
+        }
+    }
+};
+
+function validateInputs(eventName, eventDate) {
+    if (validateName(eventName) && validateDate(eventDate)) {
+        return true;
+    }
+    return false;
+};
+
+function calculateTimeRemaining(ms) {
+    return { days: getDays(ms), hours: getHours(ms), minutes: getMinutes(ms), seconds: getSeconds(ms) };
+}
+
+function tickCountdown (name, date) {
+    const now = Date.now();
+    const msLeft = date - now;
+    const countdownElement = document.getElementById(`${name}-countdown-timer-div`);
+
+    const units = calculateTimeRemaining(msLeft);
+
+    if (!countdownElement) {
+        createCountdownElement(name, units);
+    } else {
+        // this is fine but the name doesn't need to be updated every time
+        countdownElement.innerHTML = `${name}: ${units.days}d ${units.hours}h ${units.minutes}m ${units.seconds}s`;
+    }
+};
+
+function createTick(name, date) {
+    return setInterval(() => tickCountdown(name, date), 1000);
+}
+
+function createCountdown() {
+    const eventName = document.getElementById("event-name").value;
+    const eventTime = document.getElementById("event-time").value || "00:00";
+    const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
+
+    if(validateInputs(eventName, eventDate)) {
+        countdowns[eventName] = { timestamp: eventDate, interval: createTick(eventName, eventDate) };
+        tickCountdown(eventName, eventDate);
+
+    }
+}
+
+function createCountdownElement(name, units) {
+    const {days, hours, minutes, seconds} = units;
+    const countdownLi = document.createElement("li");
+    countdownLi.setAttribute("id", `${name}-countdown-timer`);
+    countdownLi.setAttribute("class", "list-group-item");
+
+    const countdownCard = document.createElement("div");
+    countdownCard.setAttribute("class", 'card')
+
+    const countdownCardBody = document.createElement("div");
+    countdownCardBody.setAttribute("class", "card-body")
+
+    const countdownCardTitle = document.createElement("h5");
+    countdownCardTitle.setAttribute("class", "card-title");
+    countdownCardTitle.innerHTML = name;
+
+    const countdownCardText = document.createElement("p");
+    countdownCardText.setAttribute("class", "card-text");
+    countdownCardText.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`
+
+    let deleteButton = document.createElement("button");
+    deleteButton.setAttribute("class", "btn btn-primary")
+    // deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
+    deleteButton.onclick = () => console.log('delete')
+    deleteButton.innerHTML = 'X';
+
+    countdownLi.appendChild(countdownCard)
+    countdownCard.appendChild(countdownCardBody)
+    countdownCardBody.appendChild(countdownCardTitle).appendChild(countdownCardText).appendChild(deleteButton);
+
+
+
+
+    // let saveButton = document.createElement("BUTTON");
+    // saveButton.onclick = () => saveTimer(name);
+
+    let countdownDiv = document.createElement("div");
+    // countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
+
+    // saveButton.innerHTML = 'Save';
+
+
+    // countdownDiv.innerHTML = 
+    // console.log(document.getElementById(`${name}-countdown-timer`));
+    // countdownLi.appendChild(countdownDiv);
+    // countdownLi.appendChild(deleteButton);
+    // countdownLi.appendChild(saveButton);
+
+    document.getElementById("countdown-list").appendChild(countdownLi);
+}
+
+
+// END OF ALL DONE
 
 
 function clearStorage() {
@@ -33,39 +176,6 @@ window.onload = function() {
 function updateErrorStyling(elementID, val, colour) {
     document.getElementById(`event-${elementID}-error`).innerHTML = val;
     document.getElementById(`event-${elementID}`).style.border = colour;
-}
-
-function validateName(nameString) {
-    if (!nameString) {
-        updateErrorStyling("name", "You must provide an event name", "1px solid red");
-        return false;
-    } else if (dates[nameString]) {
-        updateErrorStyling("name", "A timer with that name already exists.", "1px solid red");
-        return false;
-    }
-    updateErrorStyling("name", "", "1px solid #ced4da");
-    return true;
-}
-
-function validateDate(timestamp) {
-    if (!timestamp) {
-        updateErrorStyling("date", "You must provide an event date", "1px solid red");
-        return false;
-    } else {
-        if ((timestamp - Date.now()) < 0) {
-            updateErrorStyling("date", "You cannot enter a date in the past", "1px solid red");
-            return false;
-        } else if (timestamp > (Date.now() + 8640000000)) {
-            updateErrorStyling("date", "You cannot enter a date that far in the future", "1px solid red");
-            return false;
-        } else if (Object.values(dates).includes(timestamp)) {
-            updateErrorStyling("date", "A countdown to that date already exists", "1px solid red");
-            return false;
-        } else {
-            updateErrorStyling("date", "", "1px solid #ced4da");
-            return true;
-        }
-    }
 }
 
 function removeDOMElement(id, name) {
@@ -120,53 +230,19 @@ function handleEventReached(name) {
 
 
 
-
-function createCountdown() {
-    const eventName = document.getElementById("event-name").value;
-    const eventTime = document.getElementById("event-time").value || "00:00";
-    const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
-
-    if(validateInputs(eventName, eventDate)) {
-        // calculate time remaining
-        countdowns[eventName] = { timestamp: eventDate, interval: null}
-        workOutTimeLeft(eventName, eventDate);
-        createTimers(); // << this calls the above also...
-    }
-}
-
 // create timer LI
 
-function startTimer() {
-    var eventName = document.getElementById("event-name").value;
-    var eventTime = document.getElementById("event-time").value || "00:00";
-    var eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
 
-    if (validateInputs(eventName, eventDate)) {
-        dates[eventName] = eventDate;
-        workOutTimeLeft(eventName, eventDate);
-        createTimers();
-    }
-}
 
-function validateInputs(eventName, eventDate) {
-    if (validateName(eventName) && validateDate(eventDate)) {
-        return true;
-    }
-    return false;
-}
 
-function createInterval(name, date) {
-    return setInterval(() => calculateTimeRemaining(name, date), 1000);
-}
-
-function createTimers() {
-    timers.forEach(timer => {
-        clearInterval(timer.timer)
-    })
-    for (let [key, value] of Object.entries(dates)) {
-        timers.push({ name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
-    }
-}
+// function createTimers() {
+//     timers.forEach(timer => {
+//         clearInterval(timer.timer)
+//     })
+//     for (let [key, value] of Object.entries(dates)) {
+//         timers.push({ name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
+//     }
+// }
 
 function saveTimer(name) {
     let obj = {};
@@ -196,73 +272,24 @@ function deleteTimer(name) {
 
 }
 
-formatString = (units) => ""+units.padStart(2, "0");
-
-getDays = (timeUntil) => formatString(Math.floor(timeUntil / (1000 * 60 * 60 * 24)));
-getHours = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-getMinutes = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60)));
-getSeconds = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60)) / 1000));
 
 function handlePlaceholderVisibility() {
     const element = document.getElementById('no-countdowns-li');
 
 }
 
-function createCountdownElement(name, units) {
-    const {days, hours, minutes, seconds} = units;
-    let countdownLi = document.createElement("li");
-    countdownLi.setAttribute("id", `${name}-countdown-timer`);
-    countdownLi.setAttribute("class", "list-group-item");
 
-    // let deleteButton = document.createElement("BUTTON");
-    // deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
-
-    // let saveButton = document.createElement("BUTTON");
-    // saveButton.onclick = () => saveTimer(name);
-
-    let countdownDiv = document.createElement("div");
-    countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
-
-    // deleteButton.innerHTML = 'X';
-    // saveButton.innerHTML = 'Save';
-
-
-    countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
-    // console.log(document.getElementById(`${name}-countdown-timer`));
-    countdownLi.appendChild(countdownDiv);
-    // countdownLi.appendChild(deleteButton);
-    // countdownLi.appendChild(saveButton);
-
-    document.getElementById("countdown-list").appendChild(countdownLi);
-}
 
 function updateCountdownElement(element, units) {
 
 }
 
-function calculateTimeRemaining(ms) {
-    return { days: getDays(ms), hours: getHours(ms), minutes: getMinutes(ms), seconds: getSeconds(ms) };
-}
 
-function tickCountdown (name, date) {
-    const now = Date.now();
-    const msLeft = date - now;
-    const countdownElement = document.getElementById(`${name}-countdown-timer-div`);
 
-    const units = calculateTimeRemaining(msLeft);
 
-    if (!countdownElement) {
-        createCountdownElement(name, units);
-    } else {
-        // this is fine but the name doesn't need to be updated every time
-        countdownElement.innerHTML = `${name}: ${units.days}d ${units.hours}h ${units.minutes}m ${units.seconds}s`;
-    }
+// const countdownElement  = document.getElementById(`${name}-countdown-timer-div`);
 
-    // const countdownElement  = document.getElementById(`${name}-countdown-timer-div`);
-
-    // handlePlaceholderVisibility(document.getElementById('no-countdowns-li'));
-};
-
+// handlePlaceholderVisibility(document.getElementById('no-countdowns-li'));
 
 // the interval needs to calculate the time left, and then update the UI
 
