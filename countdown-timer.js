@@ -74,7 +74,7 @@ function calculateTimeRemaining(ms) {
 function tickCountdown (name, date) {
     const now = Date.now();
     const msLeft = date - now;
-    const countdownElement = document.getElementById(`${name}-countdown-timer-div`);
+    const countdownElement = document.getElementById(`${name}-countdown-card-text`);
 
     const units = calculateTimeRemaining(msLeft);
 
@@ -82,7 +82,7 @@ function tickCountdown (name, date) {
         createCountdownElement(name, units);
     } else {
         // this is fine but the name doesn't need to be updated every time
-        countdownElement.innerHTML = `${name}: ${units.days}d ${units.hours}h ${units.minutes}m ${units.seconds}s`;
+        countdownElement.innerHTML = `${units.days}d ${units.hours}h ${units.minutes}m ${units.seconds}s`;
     }
 };
 
@@ -114,24 +114,47 @@ function createCountdownElement(name, units) {
     const countdownCardBody = document.createElement("div");
     countdownCardBody.setAttribute("class", "card-body")
 
-    const countdownCardTitle = document.createElement("h5");
+    const countdownCardTitle = document.createElement("h4");
     countdownCardTitle.setAttribute("class", "card-title");
     countdownCardTitle.innerHTML = name;
 
     const countdownCardText = document.createElement("p");
     countdownCardText.setAttribute("class", "card-text");
+    countdownCardText.setAttribute("id", `${name}-countdown-card-text`)
+    countdownCardText.setAttribute("style", "text-align: center; font-size: 8vw;")
+
     countdownCardText.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`
 
+    const countdownCardButtons = document.createElement("div")
+    countdownCardButtons.setAttribute("class", "btn-group float-right");
+    countdownCardButtons.setAttribute("role", "group");
+    
+
     let deleteButton = document.createElement("button");
-    deleteButton.setAttribute("class", "btn btn-primary")
+    deleteButton.setAttribute("class", "btn btn-danger")
+    deleteButton.setAttribute("type", "button")
+
     // deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
     deleteButton.onclick = () => console.log('delete')
-    deleteButton.innerHTML = 'X';
+    deleteButton.innerHTML = 'Delete';
+
+    let saveButton = document.createElement("button");
+    saveButton.setAttribute("class", "btn btn-success")
+    saveButton.setAttribute("type", "button")
+
+    // saveButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
+    saveButton.onclick = () => console.log('save sand remove button')
+    saveButton.innerHTML = 'Save';
 
     countdownLi.appendChild(countdownCard)
     countdownCard.appendChild(countdownCardBody)
-    countdownCardBody.appendChild(countdownCardTitle).appendChild(countdownCardText).appendChild(deleteButton);
+    countdownCardBody.appendChild(countdownCardTitle)
+    countdownCardBody.appendChild(countdownCardText)
+    countdownCardBody.appendChild(countdownCardButtons)
+    countdownCardButtons.appendChild(deleteButton)
+    countdownCardButtons.appendChild(saveButton)
 
+    
 
 
 
