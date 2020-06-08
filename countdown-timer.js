@@ -4,7 +4,6 @@ var foo;
 
 // TODO:
 // Disable save button after timer has been saved - do not add a save button to the timer li after it has been created from localstorage
-// update general styling
 // Have clear TImers button call clearStorage() and delete all timers. 
 // Test creation and clearing of timers from storage, and saving and delting of timers
 // genral refactoring
@@ -131,28 +130,30 @@ function createCountdownElement(name, units) {
     
 
     let deleteButton = document.createElement("button");
-    deleteButton.setAttribute("class", "btn btn-danger")
+    deleteButton.setAttribute("class", "btn btn-danger float-right")
     deleteButton.setAttribute("type", "button")
 
     // deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
-    deleteButton.onclick = () => console.log('delete')
+    deleteButton.onclick = () => deleteTimer(name);
     deleteButton.innerHTML = 'Delete';
 
     let saveButton = document.createElement("button");
-    saveButton.setAttribute("class", "btn btn-success")
+    saveButton.setAttribute("class", "btn btn-success float-right")
+    saveButton.setAttribute("style", "margin-right: 4px;")
+
     saveButton.setAttribute("type", "button")
 
     // saveButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
-    saveButton.onclick = () => console.log('save sand remove button')
+    saveButton.onclick = () => saveTimer(name);
     saveButton.innerHTML = 'Save';
 
     countdownLi.appendChild(countdownCard)
     countdownCard.appendChild(countdownCardBody)
     countdownCardBody.appendChild(countdownCardTitle)
     countdownCardBody.appendChild(countdownCardText)
-    countdownCardBody.appendChild(countdownCardButtons)
-    countdownCardButtons.appendChild(deleteButton)
-    countdownCardButtons.appendChild(saveButton)
+    // countdownCardBody.appendChild(countdownCardButtons)
+    countdownCardBody.appendChild(deleteButton)
+    countdownCardBody.appendChild(saveButton)
 
     
 
@@ -269,7 +270,7 @@ function handleEventReached(name) {
 
 function saveTimer(name) {
     let obj = {};
-    obj[name] = dates[name];
+    obj[name] = countdowns[name].timestamp;
 
     console.log(obj, 'obj')
 
@@ -283,17 +284,17 @@ function saveTimer(name) {
 }
 
 function deleteTimer(name) {
-    //delete from localStorage if it's there
+    clearInterval(countdowns[name].interval);
+    delete countdowns[name];
 
-    clearInterval(timers.find(timer => timer.name === name).timer);
-    timers = timers.filter(timer => timer.name != name);
-    delete dates[name];
+    // clearInterval(timers.find(timer => timer.name === name).timer);
+    // timers = timers.filter(timer => timer.name != name);
+    // delete dates[name];
 
-    const timerDiv = document.getElementById(`${name}-countdown-timer-div`);
-
-
-
+    const countdownDiv = document.getElementById(`${name}-countdown-timer`);
+    countdownDiv.parentNode.removeChild(countdownDiv);
 }
+
 
 
 function handlePlaceholderVisibility() {
@@ -306,78 +307,3 @@ function handlePlaceholderVisibility() {
 function updateCountdownElement(element, units) {
 
 }
-
-
-
-
-// const countdownElement  = document.getElementById(`${name}-countdown-timer-div`);
-
-// handlePlaceholderVisibility(document.getElementById('no-countdowns-li'));
-
-// the interval needs to calculate the time left, and then update the UI
-
-// a function that works out time time units and updates the UI
-// that function needs to know the 
-
-
-
-function workOutTimeLeft(name, date) {
-    let now = Date.now();
-
-    // don't do this if the modal is already open. But open it after the open modal is closed if another countdown is reached
-    if (now > date) {
-        handleEventReached(name);
-        // handle a timer that has been reached
-        // delete timer and have a pop-up, or change the timer somehow
-        clearInterval(timers.find(timer => timer.name === name).timer)
-        document.getElementById("countdown-modal-body").innerHTML = name;
-        $("#exampleModal").modal();
-        var audio = document.getElementById("alert")
-        audio.currentTime = 0;
-        audio.play();
-    }
-    let days, hours, minutes, seconds;
-    let timeUntil = date - now;
-
-    days = getDays(timeUntil);
-    hours = getHours(timeUntil);
-    minutes = getMinutes(timeUntil);
-    seconds = getSeconds(timeUntil);
-
-
-    let listPlaceholder = document.getElementById('no-countdowns-li');
-
-    if (listPlaceholder) {
-        removeDOMElement('no-countdowns-li')
-    }
-
-    if (!document.getElementById(`${name}-countdown-timer-div`)) {
-        let countdownLi = document.createElement("li");
-        countdownLi.setAttribute("id", `${name}-countdown-timer`);
-        countdownLi.setAttribute("class", "list-group-item");
-
-        let deleteButton = document.createElement("BUTTON");
-        deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
-
-        let saveButton = document.createElement("BUTTON");
-        saveButton.onclick = () => saveTimer(name);
-
-        let countdownDiv = document.createElement("div");
-        countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
-
-        deleteButton.innerHTML = 'X';
-        saveButton.innerHTML = 'Save';
-
-
-        countdownDiv.innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
-        // console.log(document.getElementById(`${name}-countdown-timer`));
-        countdownLi.appendChild(countdownDiv);
-        countdownLi.appendChild(deleteButton);
-        countdownLi.appendChild(saveButton);
-
-        document.getElementById("countdown-list").appendChild(countdownLi);
-
-    } else {
-        document.getElementById(`${name}-countdown-timer-div`).innerHTML = `${name}: ${days}d ${hours}h ${minutes}m ${seconds}s`
-    }
-};

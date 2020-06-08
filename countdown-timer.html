@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" rel="stylesheet">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -21,14 +20,6 @@
 </head>
 
 <body>
-  <!-- TODO: make a nice responsive title -->
-
-
-
-  <!-- TODO:
- User can save the event so that it persists across sessions
- -->
-
   <div class="container">
     <h1 class="display-3" style="text-align: center; font-size: 3rem;">Countdown Timer</h1>
   </div>
@@ -57,15 +48,16 @@
   <div class="container" id="countdown-holder" style="margin-top: 100px;">
     <div class="card">
       <div class="card-header">
-        Countdowns
+        <h4>Countdowns</h4>
       </div>
       <ul id="countdown-list" class="list-group list-group-flush">
         <li id="no-countdowns-li" class="list-group-item">No countdowns set</li>
       </ul>
     </div>
-    <button type="button" class="btn btn-secondary" style="margin: 0 auto;" onclick="clearStorage()">Clear
+    <button type="button" class="btn btn-secondary float-right" style="width: 100%; margin-top: 4px;" onclick="clearStorage()">Clear
       Timers</button>
   </div>
+
 
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
