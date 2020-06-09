@@ -138,6 +138,10 @@ function createCountdown(eventName, eventDate) {
 // TODO: refactor this
 function createCountdownElement(name, units) {
     const { days, hours, minutes, seconds } = units;
+    let storedTimers = [];
+
+    if (localStorage.timers) storedTimers = Object.keys(JSON.parse(localStorage.timers)[0]);
+
     const countdownLi = document.createElement("li");
     countdownLi.setAttribute("id", `${name}-countdown-timer`);
     countdownLi.setAttribute("class", "list-group-item");
@@ -173,7 +177,9 @@ function createCountdownElement(name, units) {
 
     let saveButton = document.createElement("button");
     saveButton.setAttribute("class", "btn btn-success float-right")
+    saveButton.setAttribute("id", `${name}-delete-button`);
     saveButton.setAttribute("style", "margin-right: 4px;")
+    if (storedTimers.length && storedTimers.includes(name)) saveButton.setAttribute("disabled", true);
 
     saveButton.setAttribute("type", "button")
 
@@ -205,6 +211,8 @@ function stopAudio() {
 function saveTimer(name) {
     let obj = {};
     obj[name] = countdowns[name].timestamp;
+    let button = document.getElementById(`${name}-delete-button`);
+    button.setAttribute("disabled", true);
 
     if (localStorage.timers && localStorage.timers.length) {
         let timersInStorage = JSON.parse(localStorage.timers)[0]
