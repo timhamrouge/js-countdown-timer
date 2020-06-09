@@ -1,18 +1,34 @@
 var countdowns = {};
-var foo;
 
-showstorage = () => console.log(localStorage)
+showstorage = () => console.log(localStorage);
+
 
 // TODO:
 // Disable save button after timer has been saved - do not add a save button to the timer li after it has been created from localstorage
-// Have clear TImers button call clearStorage() and delete all timers. 
-// Test creation and clearing of timers from storage, and saving and delting of timers
-// genral refactoring
-// update the timer finished modal, the timer finished logic, and the modal appearing logic
 
+
+
+window.onload = function () {
+    console.log(localStorage)
+    if (localStorage.timers && localStorage.timers.length) {
+        for (let [key, value] of Object.entries(JSON.parse(localStorage.timers)[0])) {
+            createCountdown(key, value);
+        }
+    }
+};
 
 // THIS IS ALL DONE
 
+function clearStorage() {
+    delete localStorage.timers;
+}
+
+function clearAllTimers() {
+    clearStorage();
+    for(countdown in countdowns) {
+        deleteTimer(countdown)
+    }
+}
 
 formatString = (unit) => String(unit).padStart(2, "0");
 
@@ -67,12 +83,26 @@ function validateInputs(eventName, eventDate) {
     return false;
 };
 
+function handleEventReached(name) {
+    document.getElementById("countdown-modal-body").innerHTML = name;
+    const audio = document.getElementById("alert");
+    audio.currentTime = 0;
+    audio.play();
+    $("#countdown-modal").modal();
+    deleteTimer(name);
+}
+
 function calculateTimeRemaining(ms) {
     return { days: getDays(ms), hours: getHours(ms), minutes: getMinutes(ms), seconds: getSeconds(ms) };
-}
+};
 
 function tickCountdown(name, date) {
     const now = Date.now();
+
+    if (now > date) {
+        return handleEventReached(name);
+    }
+
     const msLeft = date - now;
     const countdownElement = document.getElementById(`${name}-countdown-card-text`);
 
@@ -88,19 +118,22 @@ function tickCountdown(name, date) {
 
 function createTick(name, date) {
     return setInterval(() => tickCountdown(name, date), 1000);
-}
+};
 
-function createCountdown() {
+function validateForm() {
     const eventName = document.getElementById("event-name").value;
     const eventTime = document.getElementById("event-time").value || "00:00";
     const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
 
     if (validateInputs(eventName, eventDate)) {
-        countdowns[eventName] = { timestamp: eventDate, interval: createTick(eventName, eventDate) };
-        tickCountdown(eventName, eventDate);
-
+        createCountdown(eventName, eventDate)
     }
-}
+};
+
+function createCountdown(eventName, eventDate) {
+    countdowns[eventName] = { timestamp: eventDate, interval: createTick(eventName, eventDate) };
+    tickCountdown(eventName, eventDate);
+};
 
 // TODO: refactor this
 function createCountdownElement(name, units) {
@@ -135,7 +168,6 @@ function createCountdownElement(name, units) {
     deleteButton.setAttribute("class", "btn btn-danger float-right")
     deleteButton.setAttribute("type", "button")
 
-    // deleteButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
     deleteButton.onclick = () => deleteTimer(name);
     deleteButton.innerHTML = 'Delete';
 
@@ -145,7 +177,6 @@ function createCountdownElement(name, units) {
 
     saveButton.setAttribute("type", "button")
 
-    // saveButton.onclick = () => removeDOMElement(`${name}-countdown-timer`, name)
     saveButton.onclick = () => saveTimer(name);
     saveButton.innerHTML = 'Save';
 
@@ -153,113 +184,23 @@ function createCountdownElement(name, units) {
     countdownCard.appendChild(countdownCardBody)
     countdownCardBody.appendChild(countdownCardTitle)
     countdownCardBody.appendChild(countdownCardText)
-    // countdownCardBody.appendChild(countdownCardButtons)
     countdownCardBody.appendChild(deleteButton)
     countdownCardBody.appendChild(saveButton)
-
-
-
-
-
-    // let saveButton = document.createElement("BUTTON");
-    // saveButton.onclick = () => saveTimer(name);
-
-    let countdownDiv = document.createElement("div");
-    // countdownDiv.setAttribute("id", `${name}-countdown-timer-div`);
-
-    // saveButton.innerHTML = 'Save';
-
-
-    // countdownDiv.innerHTML = 
-    // console.log(document.getElementById(`${name}-countdown-timer`));
-    // countdownLi.appendChild(countdownDiv);
-    // countdownLi.appendChild(deleteButton);
-    // countdownLi.appendChild(saveButton);
 
     document.getElementById("countdown-list").appendChild(countdownLi);
 }
 
 
-// END OF ALL DONE
-
-
-function clearStorage() {
-    delete localStorage.timers;
-}
-
-window.onload = function () {
-    console.log(localStorage)
-    if (localStorage.timers && localStorage.timers.length) {
-        dates = JSON.parse(localStorage.timers)[0]
-        console.log(dates)
-        for (let [key, value] of Object.entries(dates)) {
-            workOutTimeLeft(key, value);
-        }
-        createTimers();
-    }
-}
 
 function updateErrorStyling(elementID, val, colour) {
     document.getElementById(`event-${elementID}-error`).innerHTML = val;
     document.getElementById(`event-${elementID}`).style.border = colour;
 }
 
-function removeDOMElement(id, name) {
-    const countdownList = document.getElementById('countdown-list');
-
-    if (name) {
-        if (localStorage.timers && localStorage.timers.length) {
-            if (Object.keys(JSON.parse(localStorage.timers)[0]).includes(name)) {
-                let obj = JSON.parse(localStorage.timers)[0];
-                delete obj[name];
-                if (Object.keys(obj).length) {
-                    localStorage.timers = JSON.stringify([obj]);
-                } else {
-                    clearStorage();
-                }
-            }
-            console.log(Object.keys(JSON.parse(localStorage.timers)[0]));
-            // if (Object.keys(JSON.parse(localStorage.timers[])))
-        }
-        delete dates[name];
-        clearInterval(timers.find(timer => timer.name === name).timer)
-        timers = timers.filter(timer => timer.name != name);
-    }
-
-    var element = document.getElementById(id);
-    countdownList.removeChild(element);
-
-
-    //     <ul id="countdown-list" class="list-group list-group-flush">
-    //     <li class="list-group-item">No countdowns set</li>
-    //   </ul>
-
-    if (!countdownList.children.length && name) {
-        let countdownLi = document.createElement("li");
-        countdownLi.setAttribute("class", "list-group-item");
-        countdownLi.setAttribute("id", "no-countdowns-li");
-        countdownLi.innerHTML = 'No countdowns set'
-        countdownList.appendChild(countdownLi);
-    }
-}
-
 function stopAudio() {
     var audio = document.getElementById("alert")
     audio.pause();
 }
-
-function handleEventReached(name) {
-    console.log(name)
-    // delete the timer, from localstorage and the global object, clear the interval
-}
-
-
-
-
-// create timer LI
-
-
-
 
 function saveTimer(name) {
     let obj = {};
@@ -275,8 +216,6 @@ function saveTimer(name) {
 function deleteTimer(name) {
     clearInterval(countdowns[name].interval);
     delete countdowns[name];
-
-    console.log(Object.keys(JSON.parse(localStorage.timers)[0]).includes(name))
 
     if (localStorage.timers && localStorage.timers.length && Object.keys(JSON.parse(localStorage.timers)[0]).includes(name)) {
         let timers = JSON.parse(localStorage.timers)[0];
@@ -301,8 +240,3 @@ function handlePlaceholderVisibility() {
 
 }
 
-
-
-function updateCountdownElement(element, units) {
-
-}

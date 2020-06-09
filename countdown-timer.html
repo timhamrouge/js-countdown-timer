@@ -42,7 +42,7 @@
       <input type="time" name="event-time" id="event-time" class="form-control" /><br>
     </div>
 
-    <button type="button" class="btn btn-success float-right" onclick="createCountdown()">Start Countdown</button>
+    <button type="button" class="btn btn-success float-right" onclick="validateForm()">Start Countdown</button>
   </div>
 
   <div class="container" id="countdown-holder" style="margin-top: 100px;">
@@ -54,13 +54,13 @@
         <li id="no-countdowns-li" class="list-group-item">No countdowns set</li>
       </ul>
     </div>
-    <button type="button" class="btn btn-secondary float-right" style="width: 100%; margin-top: 4px;" onclick="clearStorage()">Clear
+    <button type="button" class="btn btn-secondary float-right" style="width: 100%; margin-top: 4px;" onclick="clearAllTimers()">Clear
       Timers</button>
   </div>
 
 
   <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  <div class="modal fade" id="countdown-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
   >
     <!-- aria-hidden="true"> -->
     <div class="modal-dialog" role="document">
