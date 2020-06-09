@@ -1,17 +1,15 @@
 var countdowns = {};
 
-showstorage = () => console.log(localStorage);
-
-
 // TODO:
 // refactor the modal so that it won't open twice, but will open after an alarm has been set off, then the modal closed.
-// change the 'No COuntdows Set' placeholder visibility depending on the countdowns set.
-// delet 
+// change the 'No Countdows Set' placeholder visibility depending on the countdowns set.
+// refactor createCountdownElement
+// reorder functions to make more logical sense
+
 
 
 
 window.onload = function () {
-    console.log(localStorage)
     if (localStorage.timers && localStorage.timers.length) {
         for (let [key, value] of Object.entries(JSON.parse(localStorage.timers)[0])) {
             createCountdown(key, value);
@@ -112,7 +110,6 @@ function tickCountdown(name, date) {
     if (!countdownElement) {
         createCountdownElement(name, units);
     } else {
-        // this is fine but the name doesn't need to be updated every time
         countdownElement.innerHTML = `${units.days}d ${units.hours}h ${units.minutes}m ${units.seconds}s`;
     }
 };
