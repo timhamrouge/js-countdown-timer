@@ -4,7 +4,9 @@ showstorage = () => console.log(localStorage);
 
 
 // TODO:
-// Disable save button after timer has been saved - do not add a save button to the timer li after it has been created from localstorage
+// refactor the modal so that it won't open twice, but will open after an alarm has been set off, then the modal closed.
+// change the 'No COuntdows Set' placeholder visibility depending on the countdowns set.
+// delet 
 
 
 
@@ -17,7 +19,6 @@ window.onload = function () {
     }
 };
 
-// THIS IS ALL DONE
 
 function clearStorage() {
     delete localStorage.timers;
@@ -40,13 +41,13 @@ getSeconds = (timeUntil) => formatString(Math.floor((timeUntil % (1000 * 60)) / 
 
 function validateName(nameString) {
     if (!nameString) {
-        updateErrorStyling("name", "You must provide an event name", "1px solid red");
+        updateErrorStyling("name", "You must provide an event name", "red");
         return false;
     } else if (countdowns[nameString]) {
-        updateErrorStyling("name", "A timer with that name already exists.", "1px solid red");
+        updateErrorStyling("name", "A timer with that name already exists.", "red");
         return false;
     }
-    updateErrorStyling("name", "", "1px solid #ced4da");
+    updateErrorStyling("name", "", "#ced4da");
     return true;
 };
 
@@ -57,20 +58,20 @@ function timestampExists(timestamp) {
 function validateDate(timestamp) {
 
     if (!timestamp) {
-        updateErrorStyling("date", "You must provide an event date", "1px solid red");
+        updateErrorStyling("date", "You must provide an event date", "red");
         return false;
     } else {
         if ((timestamp - Date.now()) < 0) {
-            updateErrorStyling("date", "You cannot enter a date in the past", "1px solid red");
+            updateErrorStyling("date", "You cannot enter a date in the past", "red");
             return false;
         } else if (timestamp > (Date.now() + 8640000000)) {
-            updateErrorStyling("date", "You cannot enter a date that far in the future", "1px solid red");
+            updateErrorStyling("date", "You cannot enter a date that far in the future", "red");
             return false;
         } else if (timestampExists(timestamp)) {
-            updateErrorStyling("date", "A countdown to that date already exists", "1px solid red");
+            updateErrorStyling("date", "A countdown to that date already exists", "red");
             return false;
         } else {
-            updateErrorStyling("date", "", "1px solid #ced4da");
+            updateErrorStyling("date", "", "#ced4da");
             return true;
         }
     }
@@ -200,7 +201,7 @@ function createCountdownElement(name, units) {
 
 function updateErrorStyling(elementID, val, colour) {
     document.getElementById(`event-${elementID}-error`).innerHTML = val;
-    document.getElementById(`event-${elementID}`).style.border = colour;
+    document.getElementById(`event-${elementID}`).style.border = '1px solid ' + colour;
 }
 
 function stopAudio() {
@@ -236,7 +237,6 @@ function deleteTimer(name) {
 
 
     }
-    // TODO: put this in Delete DOM element function
     const countdownDiv = document.getElementById(`${name}-countdown-timer`);
     countdownDiv.parentNode.removeChild(countdownDiv);
 }
@@ -245,6 +245,5 @@ function deleteTimer(name) {
 // TODO: this functionality
 function handlePlaceholderVisibility() {
     const element = document.getElementById('no-countdowns-li');
-
 }
 
