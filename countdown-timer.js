@@ -1,6 +1,7 @@
 var countdowns = {};
 var foo;
 
+showstorage = () => console.log(localStorage)
 
 // TODO:
 // Disable save button after timer has been saved - do not add a save button to the timer li after it has been created from localstorage
@@ -70,7 +71,7 @@ function calculateTimeRemaining(ms) {
     return { days: getDays(ms), hours: getHours(ms), minutes: getMinutes(ms), seconds: getSeconds(ms) };
 }
 
-function tickCountdown (name, date) {
+function tickCountdown(name, date) {
     const now = Date.now();
     const msLeft = date - now;
     const countdownElement = document.getElementById(`${name}-countdown-card-text`);
@@ -94,15 +95,16 @@ function createCountdown() {
     const eventTime = document.getElementById("event-time").value || "00:00";
     const eventDate = Date.parse(document.getElementById("event-date").value + 'T' + eventTime);
 
-    if(validateInputs(eventName, eventDate)) {
+    if (validateInputs(eventName, eventDate)) {
         countdowns[eventName] = { timestamp: eventDate, interval: createTick(eventName, eventDate) };
         tickCountdown(eventName, eventDate);
 
     }
 }
 
+// TODO: refactor this
 function createCountdownElement(name, units) {
-    const {days, hours, minutes, seconds} = units;
+    const { days, hours, minutes, seconds } = units;
     const countdownLi = document.createElement("li");
     countdownLi.setAttribute("id", `${name}-countdown-timer`);
     countdownLi.setAttribute("class", "list-group-item");
@@ -127,7 +129,7 @@ function createCountdownElement(name, units) {
     const countdownCardButtons = document.createElement("div")
     countdownCardButtons.setAttribute("class", "btn-group float-right");
     countdownCardButtons.setAttribute("role", "group");
-    
+
 
     let deleteButton = document.createElement("button");
     deleteButton.setAttribute("class", "btn btn-danger float-right")
@@ -155,7 +157,7 @@ function createCountdownElement(name, units) {
     countdownCardBody.appendChild(deleteButton)
     countdownCardBody.appendChild(saveButton)
 
-    
+
 
 
 
@@ -185,14 +187,14 @@ function clearStorage() {
     delete localStorage.timers;
 }
 
-window.onload = function() {
+window.onload = function () {
     console.log(localStorage)
     if (localStorage.timers && localStorage.timers.length) {
         dates = JSON.parse(localStorage.timers)[0]
         console.log(dates)
         for (let [key, value] of Object.entries(dates)) {
             workOutTimeLeft(key, value);
-          }
+        }
         createTimers();
     }
 }
@@ -206,7 +208,7 @@ function removeDOMElement(id, name) {
     const countdownList = document.getElementById('countdown-list');
 
     if (name) {
-        if(localStorage.timers && localStorage.timers.length) {
+        if (localStorage.timers && localStorage.timers.length) {
             if (Object.keys(JSON.parse(localStorage.timers)[0]).includes(name)) {
                 let obj = JSON.parse(localStorage.timers)[0];
                 delete obj[name];
@@ -259,44 +261,41 @@ function handleEventReached(name) {
 
 
 
-// function createTimers() {
-//     timers.forEach(timer => {
-//         clearInterval(timer.timer)
-//     })
-//     for (let [key, value] of Object.entries(dates)) {
-//         timers.push({ name: key, timer: setInterval(() => workOutTimeLeft(key, value), 1000) })
-//     }
-// }
-
 function saveTimer(name) {
     let obj = {};
     obj[name] = countdowns[name].timestamp;
-
-    console.log(obj, 'obj')
 
     if (localStorage.timers && localStorage.timers.length) {
         let timersInStorage = JSON.parse(localStorage.timers)[0]
         obj = Object.assign(timersInStorage, obj)
     }
-
-    localStorage.timers = JSON.stringify([obj])
-
+    localStorage.timers = JSON.stringify([obj]);
 }
 
 function deleteTimer(name) {
     clearInterval(countdowns[name].interval);
     delete countdowns[name];
 
-    // clearInterval(timers.find(timer => timer.name === name).timer);
-    // timers = timers.filter(timer => timer.name != name);
-    // delete dates[name];
+    console.log(Object.keys(JSON.parse(localStorage.timers)[0]).includes(name))
 
+    if (localStorage.timers && localStorage.timers.length && Object.keys(JSON.parse(localStorage.timers)[0]).includes(name)) {
+        let timers = JSON.parse(localStorage.timers)[0];
+        delete timers[name]
+        if (Object.keys(timers).length) {
+            localStorage.timers = JSON.stringify([timers]);
+        } else {
+            clearStorage();
+        }
+
+
+    }
+    // TODO: put this in Delete DOM element function
     const countdownDiv = document.getElementById(`${name}-countdown-timer`);
     countdownDiv.parentNode.removeChild(countdownDiv);
 }
 
 
-
+// TODO: this functionality
 function handlePlaceholderVisibility() {
     const element = document.getElementById('no-countdowns-li');
 
