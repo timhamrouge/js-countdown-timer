@@ -149,7 +149,7 @@ function createCountdownElement(name, units) {
     const countdownCardText = document.createElement("p");
     countdownCardText.setAttribute("class", "card-text");
     countdownCardText.setAttribute("id", `${name}-countdown-card-text`)
-    countdownCardText.setAttribute("style", "text-align: center; font-size: 8vw;")
+    countdownCardText.setAttribute("style", "text-align: center; font-size: 6vw; white-space: nowrap; width: 100%;")
     countdownCardText.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`
 
     let deleteButton = document.createElement("button");
