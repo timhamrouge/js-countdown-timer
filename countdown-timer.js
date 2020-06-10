@@ -1,13 +1,5 @@
 var countdowns = {};
 
-// TODO:
-// change the 'No Countdows Set' placeholder visibility depending on the countdowns set.
-// refactor createCountdownElement
-// reorder functions to make more logical sense
-
-
-
-
 window.onload = function () {
     if (localStorage.timers && localStorage.timers.length) {
         for (let [key, value] of Object.entries(JSON.parse(localStorage.timers)[0])) {
@@ -16,17 +8,16 @@ window.onload = function () {
     }
 };
 
-
 function clearStorage() {
     delete localStorage.timers;
-}
+};
 
 function clearAllTimers() {
     clearStorage();
     for (countdown in countdowns) {
         deleteTimer(countdown)
     }
-}
+};
 
 formatString = (unit) => String(unit).padStart(2, "0");
 
@@ -88,7 +79,7 @@ function handleEventReached(name) {
     audio.play();
     $("#countdown-modal").modal();
     deleteTimer(name);
-}
+};
 
 function calculateTimeRemaining(ms) {
     return { days: getDays(ms), hours: getHours(ms), minutes: getMinutes(ms), seconds: getSeconds(ms) };
@@ -132,7 +123,6 @@ function createCountdown(eventName, eventDate) {
     tickCountdown(eventName, eventDate);
 };
 
-// TODO: refactor this
 function createCountdownElement(name, units) {
     const { days, hours, minutes, seconds } = units;
     let storedTimers = [];
@@ -160,18 +150,11 @@ function createCountdownElement(name, units) {
     countdownCardText.setAttribute("class", "card-text");
     countdownCardText.setAttribute("id", `${name}-countdown-card-text`)
     countdownCardText.setAttribute("style", "text-align: center; font-size: 8vw;")
-
     countdownCardText.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`
-
-    const countdownCardButtons = document.createElement("div")
-    countdownCardButtons.setAttribute("class", "btn-group float-right");
-    countdownCardButtons.setAttribute("role", "group");
-
 
     let deleteButton = document.createElement("button");
     deleteButton.setAttribute("class", "btn btn-danger float-right")
     deleteButton.setAttribute("type", "button")
-
     deleteButton.onclick = () => deleteTimer(name);
     deleteButton.innerHTML = 'Delete';
 
@@ -180,9 +163,7 @@ function createCountdownElement(name, units) {
     saveButton.setAttribute("id", `${name}-delete-button`);
     saveButton.setAttribute("style", "margin-right: 4px;")
     if (storedTimers.length && storedTimers.includes(name)) saveButton.setAttribute("disabled", true);
-
     saveButton.setAttribute("type", "button")
-
     saveButton.onclick = () => saveTimer(name);
     saveButton.innerHTML = 'Save';
 
@@ -194,19 +175,17 @@ function createCountdownElement(name, units) {
     countdownCardBody.appendChild(saveButton)
 
     document.getElementById("countdown-list").appendChild(countdownLi);
-}
-
-
+};
 
 function updateErrorStyling(elementID, val, colour) {
     document.getElementById(`event-${elementID}-error`).innerHTML = val;
     document.getElementById(`event-${elementID}`).style.border = '1px solid ' + colour;
-}
+};
 
 function stopAudio() {
     var audio = document.getElementById("alert")
     audio.pause();
-}
+};
 
 function saveTimer(name) {
     let obj = {};
@@ -219,7 +198,7 @@ function saveTimer(name) {
         obj = Object.assign(timersInStorage, obj)
     }
     localStorage.timers = JSON.stringify([obj]);
-}
+};
 
 function deleteTimer(name) {
     clearInterval(countdowns[name].interval);
@@ -241,14 +220,4 @@ function deleteTimer(name) {
     countdownDiv.parentNode.removeChild(countdownDiv);
 
     if (document.getElementById("countdown-list").children.length == 1) document.getElementById("no-countdowns-li").setAttribute("style", "");
-}
-
-
-function handlePlaceholderVisibility() {
-    const element = document.getElementById('no-countdowns-li');
-
-
-
-
-}
-
+};
