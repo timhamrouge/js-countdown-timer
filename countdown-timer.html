@@ -18,7 +18,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
   <title>Countdown Timer</title>
 </head>
-<!-- TODO: refactor classes and ids and modal! -->
+
 <body>
   <div class="container">
     <h1 class="display-3" style="text-align: center; font-size: 3rem;">Countdown Timer</h1>
@@ -54,15 +54,13 @@
         <li id="no-countdowns-li" class="list-group-item">No countdowns set</li>
       </ul>
     </div>
-    <button type="button" class="btn btn-secondary float-right" style="width: 100%; margin-top: 4px;" onclick="clearAllTimers()">Clear
+    <button type="button" class="btn btn-secondary float-right" style="width: 100%; margin-top: 4px;"
+      onclick="clearAllTimers()">Clear
       Timers</button>
   </div>
 
 
-  <!-- Modal -->
-  <div class="modal fade" id="countdown-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-  >
-    <!-- aria-hidden="true"> -->
+  <div class="modal fade" id="countdown-modal" tabindex="-1" role="dialog" aria-labelledby="countdown-modal-label">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-body" id="countdown-modal-body">
@@ -81,5 +79,4 @@
   <script src="countdown-timer.js"></script>
 
 </body>
-
 </html>
