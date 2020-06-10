@@ -1,7 +1,6 @@
 var countdowns = {};
 
 // TODO:
-// refactor the modal so that it won't open twice, but will open after an alarm has been set off, then the modal closed.
 // change the 'No Countdows Set' placeholder visibility depending on the countdowns set.
 // refactor createCountdownElement
 // reorder functions to make more logical sense
@@ -24,7 +23,7 @@ function clearStorage() {
 
 function clearAllTimers() {
     clearStorage();
-    for(countdown in countdowns) {
+    for (countdown in countdowns) {
         deleteTimer(countdown)
     }
 }
@@ -138,6 +137,9 @@ function createCountdownElement(name, units) {
     const { days, hours, minutes, seconds } = units;
     let storedTimers = [];
 
+    document.getElementById("no-countdowns-li").setAttribute("style", "display: none;")
+
+
     if (localStorage.timers) storedTimers = Object.keys(JSON.parse(localStorage.timers)[0]);
 
     const countdownLi = document.createElement("li");
@@ -223,6 +225,7 @@ function deleteTimer(name) {
     clearInterval(countdowns[name].interval);
     delete countdowns[name];
 
+    
     if (localStorage.timers && localStorage.timers.length && Object.keys(JSON.parse(localStorage.timers)[0]).includes(name)) {
         let timers = JSON.parse(localStorage.timers)[0];
         delete timers[name]
@@ -231,16 +234,21 @@ function deleteTimer(name) {
         } else {
             clearStorage();
         }
-
-
+        
+        
     }
     const countdownDiv = document.getElementById(`${name}-countdown-timer`);
     countdownDiv.parentNode.removeChild(countdownDiv);
+
+    if (document.getElementById("countdown-list").children.length == 1) document.getElementById("no-countdowns-li").setAttribute("style", "");
 }
 
 
-// TODO: this functionality
 function handlePlaceholderVisibility() {
     const element = document.getElementById('no-countdowns-li');
+
+
+
+
 }
 
